@@ -36,7 +36,6 @@ import {
   Bot,
   Sparkles,
   Clock,
-  ChevronUp,
 } from 'lucide-react';
 import type { Website, ChatHistoryEntry } from '../types';
 import { storage } from '../lib/storage';
