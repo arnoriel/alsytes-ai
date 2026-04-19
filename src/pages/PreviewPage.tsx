@@ -561,18 +561,6 @@ export default function PreviewPage() {
               </button>
 
               <button
-                onClick={handleEditOpen}
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
-                  showEditPanel
-                    ? 'bg-violet-500/20 text-violet-300 border-violet-500/30'
-                    : 'bg-base-100 hover:bg-base-200 text-text-muted hover:text-text-primary border-surface-border'
-                }`}
-              >
-                <Wand2 size={12} />
-                <span className="hidden sm:inline">Ask AI</span>
-              </button>
-
-              <button
                 onClick={handleDeployOpen}
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-white transition-all hover:opacity-90 active:scale-95"
                 style={{ background: 'linear-gradient(135deg, #7C5CFC, #5A3DE8)' }}
@@ -887,36 +875,73 @@ export default function PreviewPage() {
           </div>
         )}
 
-        {/* ── Ask AI Panel (bottom drawer) ──────────────────── */}
+        {/* ── Ask AI FAB + Floating Panel ───────────────────── */}
+        {/* FAB button — always visible in bottom-right */}
+        {!fullscreen && (
+          <motion.button
+            onClick={handleEditOpen}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="fixed bottom-6 right-4 sm:right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-2xl text-sm font-semibold text-white"
+            style={{
+              background: showEditPanel
+                ? 'linear-gradient(135deg, #5A3DE8, #7C5CFC)'
+                : 'linear-gradient(135deg, #7C5CFC, #5A3DE8)',
+              boxShadow: showEditPanel
+                ? '0 0 0 3px rgba(124,92,252,0.35), 0 8px 24px rgba(124,58,237,0.5)'
+                : '0 4px 20px rgba(124,58,237,0.45)',
+            }}
+          >
+            <Wand2 size={15} />
+            <span>Ask AI</span>
+            {isEditing && <Loader2 size={13} className="animate-spin opacity-80" />}
+            {!isEditing && chatHistory.length > 0 && (
+              <span
+                className="w-5 h-5 rounded-full flex items-center justify-center text-white"
+                style={{ background: 'rgba(255,255,255,0.25)', fontSize: '10px', fontWeight: 700 }}
+              >
+                {Math.min(Math.floor(chatHistory.length / 2), 9)}
+              </span>
+            )}
+          </motion.button>
+        )}
+
+        {/* Floating panel — appears above FAB */}
         <AnimatePresence>
           {showEditPanel && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.22, ease: 'easeOut' }}
-              className="border-t border-surface-border bg-base-50 overflow-hidden flex-shrink-0"
-            >
-              <div className="px-3 md:px-4 py-3">
-                <div className="flex items-center justify-between mb-2.5">
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => { if (!isEditing) { setShowEditPanel(false); setEditError(''); } }}
+                className="fixed inset-0 z-40"
+              />
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 12 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 12 }}
+                transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                className="fixed bottom-20 right-4 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-[420px] rounded-2xl border border-surface-border bg-base-50 overflow-hidden"
+                style={{ boxShadow: '0 8px 40px rgba(124,58,237,0.18), 0 2px 20px rgba(0,0,0,0.45)' }}
+              >
+                {/* Panel header */}
+                <div className="flex items-center justify-between px-4 py-3 border-b border-surface-border">
                   <div className="flex items-center gap-2">
                     <div className="w-6 h-6 rounded-lg bg-violet-500/15 flex items-center justify-center">
                       <Wand2 size={11} className="text-violet-400" />
                     </div>
                     <span className="text-xs font-semibold text-text-primary">Ask AI to Edit</span>
                     {!isEditing && chatHistory.length > 0 && (
-                      <span className="text-xs text-violet-300/70 hidden sm:inline">
-                        — AI remembers {Math.floor(chatHistory.length / 2)} previous edit{Math.floor(chatHistory.length / 2) !== 1 ? 's' : ''}
-                      </span>
-                    )}
-                    {!isEditing && chatHistory.length === 0 && (
-                      <span className="text-xs text-text-muted hidden sm:inline">
-                        — describe the change, AI applies it surgically
+                      <span className="text-xs text-violet-300/70">
+                        — {Math.floor(chatHistory.length / 2)} edit{Math.floor(chatHistory.length / 2) !== 1 ? 's' : ''} remembered
                       </span>
                     )}
                     {isEditing && (
-                      <span className="text-xs text-violet-300/70 hidden sm:inline">
-                        — {patches.length} change{patches.length !== 1 ? 's' : ''} applied so far
+                      <span className="text-xs text-violet-300/70">
+                        — {patches.length} change{patches.length !== 1 ? 's' : ''} applied
                       </span>
                     )}
                   </div>
@@ -929,74 +954,80 @@ export default function PreviewPage() {
                   </button>
                 </div>
 
-                <div className="flex gap-2 items-end">
-                  <div className="flex-1 relative">
-                    <textarea
-                      ref={editTextareaRef}
-                      value={editPrompt}
-                      onChange={(e) => setEditPrompt(e.target.value)}
-                      onKeyDown={handleEditKeyDown}
-                      disabled={isEditing}
-                      placeholder={chatHistory.length > 0
-                        ? 'Continue editing… AI remembers previous changes'
-                        : 'e.g. Change the hero headline, make CTA button green, add testimonials...'
-                      }
-                      rows={2}
-                      className="w-full px-3 py-2.5 text-sm text-text-primary bg-base-100 border border-surface-border rounded-xl resize-none focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 placeholder:text-text-muted/50 disabled:opacity-50 transition-all"
-                    />
-                    <span className="absolute bottom-2 right-3 text-xs text-text-muted/40 pointer-events-none select-none hidden sm:block">Ctrl+↵</span>
+                {/* Input area */}
+                <div className="px-4 py-3">
+                  <div className="flex gap-2 items-end">
+                    <div className="flex-1 relative">
+                      <textarea
+                        ref={editTextareaRef}
+                        value={editPrompt}
+                        onChange={(e) => setEditPrompt(e.target.value)}
+                        onKeyDown={handleEditKeyDown}
+                        disabled={isEditing}
+                        placeholder={
+                          isEditing
+                            ? 'Applying changes…'
+                            : chatHistory.length > 0
+                              ? 'Continue editing… AI remembers previous changes'
+                              : 'Need adjustment? Ask AI here / Butuh adjustment? Tanya AI ini'
+                        }
+                        rows={3}
+                        className="w-full px-3 py-2.5 text-sm text-text-primary bg-base-100 border border-surface-border rounded-xl resize-none focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 placeholder:text-text-muted/50 disabled:opacity-50 transition-all"
+                      />
+                      <span className="absolute bottom-2 right-3 text-xs text-text-muted/40 pointer-events-none select-none">Ctrl+↵</span>
+                    </div>
+                    <button
+                      onClick={handleEditSubmit}
+                      disabled={!editPrompt.trim() || isEditing}
+                      className="flex items-center justify-center w-10 h-10 rounded-xl text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 active:scale-95 flex-shrink-0"
+                      style={{ background: 'linear-gradient(135deg, #7C5CFC, #5A3DE8)' }}
+                    >
+                      {isEditing ? (
+                        <Loader2 size={15} className="animate-spin" />
+                      ) : editSuccess ? (
+                        <CheckCircle2 size={15} className="text-green-300" />
+                      ) : (
+                        <Send size={15} />
+                      )}
+                    </button>
                   </div>
 
-                  <button
-                    onClick={handleEditSubmit}
-                    disabled={!editPrompt.trim() || isEditing}
-                    className="flex items-center gap-2 px-3 md:px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 active:scale-95 flex-shrink-0"
-                    style={{ background: 'linear-gradient(135deg, #7C5CFC, #5A3DE8)' }}
-                  >
-                    {isEditing ? (
-                      <><Loader2 size={13} className="animate-spin" /><span className="hidden sm:inline">Editing…</span></>
-                    ) : editSuccess ? (
-                      <><CheckCircle2 size={13} className="text-green-300" /><span className="hidden sm:inline">Done!</span></>
-                    ) : (
-                      <><Send size={13} /><span className="hidden sm:inline">Apply</span></>
-                    )}
-                  </button>
-                </div>
-
-                {editSuccess && diffStats && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mt-2 flex items-center gap-3 text-xs flex-wrap"
-                  >
-                    <CheckCircle2 size={12} className="text-emerald-400" />
-                    <span className="text-emerald-400 font-medium">
-                      {patches.filter(p => p.success).length} change{patches.filter(p => p.success).length !== 1 ? 's' : ''} applied
-                    </span>
-                    <span className="text-text-muted">·</span>
-                    <span className="text-emerald-400">+{diffStats.added} lines</span>
-                    <span className="text-red-400">−{diffStats.removed} lines</span>
-                    <span className="text-text-muted">·</span>
-                    <button
-                      onClick={() => setShowChatPanel(true)}
-                      className="text-violet-400 hover:text-violet-300 transition-colors"
+                  {/* Success */}
+                  {editSuccess && diffStats && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-2.5 flex items-center gap-2 text-xs flex-wrap"
                     >
-                      View history →
-                    </button>
-                  </motion.div>
-                )}
+                      <CheckCircle2 size={12} className="text-emerald-400" />
+                      <span className="text-emerald-400 font-medium">
+                        {patches.filter(p => p.success).length} change{patches.filter(p => p.success).length !== 1 ? 's' : ''} applied
+                      </span>
+                      <span className="text-text-muted">·</span>
+                      <span className="text-emerald-400">+{diffStats.added}</span>
+                      <span className="text-red-400">−{diffStats.removed} lines</span>
+                      <button
+                        onClick={() => setShowChatPanel(true)}
+                        className="ml-auto text-violet-400 hover:text-violet-300 transition-colors"
+                      >
+                        View history →
+                      </button>
+                    </motion.div>
+                  )}
 
-                {editError && (
-                  <motion.p
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mt-2 text-xs text-red-400 flex items-center gap-1.5"
-                  >
-                    <AlertTriangle size={11} /> {editError}
-                  </motion.p>
-                )}
-              </div>
-            </motion.div>
+                  {/* Error */}
+                  {editError && (
+                    <motion.p
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-2 text-xs text-red-400 flex items-center gap-1.5"
+                    >
+                      <AlertTriangle size={11} /> {editError}
+                    </motion.p>
+                  )}
+                </div>
+              </motion.div>
+            </>
           )}
         </AnimatePresence>
       </div>
@@ -1363,7 +1394,7 @@ function CodePanelContent({
               <div className="w-5 h-5 rounded-md bg-violet-500/15 flex items-center justify-center">
                 <Terminal size={10} className="text-violet-400" />
               </div>
-              <span className="text-xs font-semibold text-violet-300">AI Editing…</span>
+              <span className="text-xs font-semibold text-violet-300">AlsytesAI Computer on Editing</span>
               <div className="flex gap-0.5">
                 <span className="w-1 h-1 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: '0ms' }} />
                 <span className="w-1 h-1 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: '150ms' }} />

@@ -205,16 +205,19 @@ CURATED PHOTO IDs BY CATEGORY:
   Interior:      1555041536045, 1600210061050, 1524758369, 1560185, 1556909144
   Product:       1523275335683, 1472851916, 1526170, 1556556984, 1503808
 
-REQUIRED SECTIONS (all must be present, fully coded):
+REQUIRED SECTIONS (all must be present, fully coded — MINIMUM 12 sections):
   1. STICKY NAVBAR — logo, nav links, CTA button, mobile hamburger; transparent → frosted glass on scroll
   2. HERO — full viewport, 72-96px display headline, subtext, 2 CTA buttons, visual element (image/animation/3D)
   3. SOCIAL PROOF — logos or stats row (animated counters on scroll: 10,000+ → counts up from 0)
-  4. FEATURES/BENEFITS — 3-6 item grid, icon per feature (inline SVG only, no emoji icons), one-liner desc
-  5. SHOWCASE — alternating image/text blocks OR masonry gallery with hover effects
-  6. TESTIMONIALS — 3 detailed quotes with avatar, name, title, company, star rating
-  7. PRICING (if applicable) OR CTA SECTION — bold conversion moment
-  8. FAQ — 5-7 questions, smooth accordion open/close with CSS transition
-  9. FOOTER — columns: links, social, contact, newsletter form; copyright
+  4. FEATURES/BENEFITS — 6-8 item grid, icon per feature (inline SVG only, no emoji icons), description + sub-detail
+  5. HOW IT WORKS — 3-5 step process with icons, connectors, and descriptive paragraphs (not one-liners)
+  6. SHOWCASE — alternating image/text blocks (minimum 3 pairs) OR masonry gallery with hover overlay effects
+  7. TESTIMONIALS — 5+ detailed quotes with avatar, name, title, company, star rating, and 2-3 sentence quote
+  8. COMPARISON TABLE — 3 columns (yours vs competitors), 6-8 feature rows, checkmarks/x marks, highlighted middle
+  9. PRICING — 3 tiers with full feature lists (8+ items each), monthly/annual toggle with JS, most popular badge
+  10. FAQ — 8-10 questions, smooth accordion with CSS max-height transition, categorized if applicable
+  11. FINAL CTA SECTION — bold full-width conversion section, email input, headline, subtext, trust badges
+  12. FOOTER — 4-column layout: product links, company links, social icons, newsletter form; copyright, legal links
 
 REQUIRED ANIMATIONS:
   1. Hero entrance: staggered translateY(40px) → 0 + opacity 0 → 1, each child 100ms delayed
@@ -336,10 +339,20 @@ OUTPUT DENSITY MANDATE
 ═══════════════════════════════════════
 You have a MASSIVE output budget (65,000 tokens). NEVER produce thin, half-built output.
 
-MINIMUM LINE COUNTS:
-  Landing Page:  900+ lines (every section complete, every animation coded)
-  App / Tool:    800+ lines (all views, all modals, full logic, seed data)
-  Game:          800+ lines (game loop, particles, sound, 3 screens, mobile controls)
+MINIMUM LINE COUNTS — NON-NEGOTIABLE:
+  Landing Page:  1500+ lines (every section complete, all animations, rich deep content)
+  App / Tool:    1200+ lines (all views, modals, full CRUD logic, seed data, onboarding)
+  Game:          1200+ lines (game loop, particles, sound, 3+ screens, mobile controls)
+
+CHARACTER COUNT MANDATE:
+  Every output MUST exceed 50,000 characters. 65,000 tokens ≈ 250,000+ possible chars.
+  If you approach "done" before 50k chars — DO NOT STOP. Instead:
+  → Add more features and interactivity to existing sections
+  → Add richer micro-animations and hover states
+  → Add more testimonials, FAQ items, feature cards, team members
+  → Add a bonus section (comparison table, process steps, stats breakdown, gallery)
+  → Deepen every JS function with more logic and edge case handling
+  You are NOT done until you have written at minimum 50,000 characters.
 
 DENSITY CHECKLIST — before finishing, verify:
   ✅ Every section has unique visual treatment (no two sections look the same)
@@ -674,6 +687,39 @@ export async function generateWebsite(
       cleanedCode = stripFences(cleanedCode + continuation);
     }
 
+    // ── Expansion pass: if output is complete but too short (< 45k chars), request more content ──
+    const MIN_TARGET_CHARS = 45000;
+    if (isHtmlComplete(cleanedCode) && cleanedCode.length < MIN_TARGET_CHARS) {
+      // Strip the closing tags so we can append more content
+      const withoutClose = cleanedCode.replace(/<\/body>\s*<\/html>\s*$/i, '').trimEnd();
+
+      const expansionMessages: Array<{ role: string; content: string }> = [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: buildGenerationPrompt(userPrompt) },
+        { role: 'assistant', content: withoutClose },
+        {
+          role: 'user',
+          content:
+            `Your output so far is only ${cleanedCode.length.toLocaleString()} characters — far below the required 50,000 character minimum.\n\n` +
+            `You stopped too early. The website needs significantly more content and polish.\n\n` +
+            `WITHOUT repeating any existing code, continue adding:\n` +
+            `• More richly detailed sections (more cards, more items, deeper content)\n` +
+            `• Additional micro-animations, hover states, and CSS polish\n` +
+            `• More JavaScript interactivity (tooltips, tabs, smooth effects)\n` +
+            `• A bonus section that wasn't in the original (comparison table, timeline, stats breakdown, team grid, or process steps)\n` +
+            `• Richer footer with more links and a newsletter form\n\n` +
+            `Continue the HTML exactly from where it left off (after the last closing tag above) and write at least ${(MIN_TARGET_CHARS - cleanedCode.length).toLocaleString()} more characters before closing with </body></html>.`,
+        },
+      ];
+
+      const expansion = await streamOnce(effectiveKey, expansionMessages, 0.85, onChunk, 40000);
+      const expandedCode = withoutClose + '\n' + stripFences(expansion);
+      // Ensure it closes properly
+      cleanedCode = isHtmlComplete(expandedCode)
+        ? expandedCode
+        : expandedCode + '\n</body></html>';
+    }
+
     onDone(stripToDoctype(cleanedCode));
   } catch (err) {
     onError(err instanceof Error ? err.message : 'Unknown error occurred');
@@ -716,6 +762,17 @@ function buildGenerationPrompt(userPrompt: string): string {
     `• NEVER use emoji as UI icons — use inline SVG paths\n` +
     `• DO NOT stop early or truncate — use the full output budget\n` +
     `• DO NOT include any text before <!DOCTYPE html> or after </html>\n\n` +
+    `━━━ FINAL LENGTH MANDATE — READ THIS LAST ━━━\n` +
+    `You MUST write a MINIMUM of 50,000 characters of HTML/CSS/JS code.\n` +
+    `That is roughly 1,500+ lines. This is NOT optional.\n` +
+    `If you finish all sections and are under 50,000 chars — DO NOT close </html> yet.\n` +
+    `Instead, continue by adding:\n` +
+    `  • More items to existing sections (more testimonials, more FAQ, more features)\n` +
+    `  • A richer showcase section with more cards or gallery items\n` +
+    `  • Additional micro-animations and CSS polish\n` +
+    `  • More detailed JS interactions (tooltips, smooth scrolling, lazy loads)\n` +
+    `  • A bonus section (comparison table, timeline, stats, process steps)\n` +
+    `Only close with </body></html> after you have written at least 50,000 characters.\n\n` +
     `Return ONLY the raw HTML, starting NOW with <!DOCTYPE html>.`
   );
 }
@@ -955,6 +1012,22 @@ function buildEditPrompt(currentSourceCode: string, editPrompt: string): string 
   );
 }
 
+// ─── HTML compressor for edit context (reduces input tokens ~40%) ─────────────
+
+function compressHtmlForEdit(html: string): string {
+  return html
+    // Strip HTML comments
+    .replace(/<!--[\s\S]*?-->/g, '')
+    // Collapse long SVG path data (d="M...") to a short placeholder — never edited by AI
+    .replace(/\s+d="[^"]{120,}"/g, ' d="[PATH]"')
+    // Truncate base64 data URIs — massive token consumers
+    .replace(/(data:[^;]+;base64,)[A-Za-z0-9+/=]{80,}/g, '$1[BASE64]')
+    // Collapse runs of whitespace (preserve single spaces and single newlines)
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 // ─── surgicalEditWebsite with conversation history ────────────────────────────
 
 export async function surgicalEditWebsite(
@@ -972,22 +1045,70 @@ export async function surgicalEditWebsite(
     return;
   }
 
+  // ── Fuzzy patch application (5 strategies, most to least strict) ─────────────
   function applyPatch(code: string, patch: EditPatch): { code: string; success: boolean } {
+    // 1. Exact match
     if (code.includes(patch.search)) {
       return { code: code.replace(patch.search, patch.replace), success: true };
     }
-    const normalised = patch.search.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-    if (code.includes(normalised)) {
-      return { code: code.replace(normalised, patch.replace), success: true };
+    // 2. Normalize line endings
+    const crNorm = patch.search.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    if (code.includes(crNorm)) {
+      return { code: code.replace(crNorm, patch.replace), success: true };
     }
+    // 3. Trim surrounding whitespace on the search string
     const trimmed = patch.search.trim();
     if (trimmed.length >= 40) {
       const idx = code.indexOf(trimmed);
       if (idx !== -1) {
-        return {
-          code: code.slice(0, idx) + patch.replace + code.slice(idx + trimmed.length),
-          success: true,
-        };
+        return { code: code.slice(0, idx) + patch.replace + code.slice(idx + trimmed.length), success: true };
+      }
+    }
+    // 4. Collapse internal whitespace runs (model may have compacted spaces)
+    const wsCollapsed = patch.search.replace(/\s+/g, ' ').trim();
+    if (wsCollapsed.length >= 40) {
+      // Try to find a region in code that also collapses to the same string
+      const codeCollapsed = code.replace(/\s+/g, ' ');
+      const colIdx = codeCollapsed.indexOf(wsCollapsed);
+      if (colIdx !== -1) {
+        // Map collapsed index back to original code by counting chars
+        let origIdx = 0, colCount = 0;
+        while (colCount < colIdx && origIdx < code.length) {
+          if (code[origIdx] !== ' ' || codeCollapsed[colCount] === ' ') colCount++;
+          origIdx++;
+        }
+        // Find end of the match region
+        let origEnd = origIdx;
+        let colSearchCount = 0;
+        while (colSearchCount < wsCollapsed.length && origEnd < code.length) {
+          if (code[origEnd] !== ' ' || colSearchCount < wsCollapsed.length) colSearchCount++;
+          origEnd++;
+        }
+        // Fallback: use a simpler extraction — find the first unique word from the search
+        const firstWord = wsCollapsed.slice(0, 40);
+        const simpleIdx = code.indexOf(firstWord);
+        if (simpleIdx !== -1) {
+          return { code: code.slice(0, simpleIdx) + patch.replace + code.slice(simpleIdx + patch.search.length), success: true };
+        }
+      }
+    }
+    // 5. Key-anchor search: find a unique 25-char anchor from the middle of search string
+    if (patch.search.length >= 60) {
+      const midStart = Math.floor(patch.search.length / 2) - 12;
+      const anchor = patch.search.slice(midStart, midStart + 25).trim();
+      if (anchor.length >= 20) {
+        const anchorIdx = code.indexOf(anchor);
+        if (anchorIdx !== -1) {
+          // Find the broader match by expanding from anchor
+          const searchStart = Math.max(0, anchorIdx - midStart);
+          const region = code.slice(searchStart, searchStart + patch.search.length + 50);
+          if (region.replace(/\s+/g, ' ').includes(wsCollapsed.slice(0, 30))) {
+            return {
+              code: code.slice(0, searchStart) + patch.replace + code.slice(searchStart + patch.search.length),
+              success: true,
+            };
+          }
+        }
       }
     }
     return { code, success: false };
@@ -997,10 +1118,18 @@ export async function surgicalEditWebsite(
   const contextNote = conversationHistory && conversationHistory.length > 0
     ? `\n\nCONVERSATION CONTEXT (previous edits to this page):\n` +
       conversationHistory
-        .slice(-4) // Last 2 turns
+        .slice(-4)
         .map(m => `[${m.role === 'user' ? 'User' : 'AI'}]: ${m.content.slice(0, 200)}`)
         .join('\n') +
       `\n\nUse this context to understand the design direction when making the current edit.`
+    : '';
+
+  // Compress source for the prompt context to reduce input tokens ~40%
+  const compressedSource = compressHtmlForEdit(currentSourceCode);
+  const inputSizeNote = currentSourceCode.length > 30000
+    ? `\n\nNOTE: Source shown here is whitespace-compressed for brevity (${compressedSource.length} chars). ` +
+      `Your search strings MUST still exactly match the original uncompressed source. ` +
+      `Focus on unique text content and attribute values in your search strings — avoid matching on whitespace patterns.`
     : '';
 
   try {
@@ -1009,8 +1138,8 @@ export async function surgicalEditWebsite(
       {
         role: 'user',
         content:
-          `HTML file to edit:\n\`\`\`html\n${currentSourceCode}\n\`\`\`\n\n` +
-          `Edit instructions: ${editPrompt}${contextNote}\n\n` +
+          `HTML file to edit:\n\`\`\`html\n${compressedSource}\n\`\`\`\n\n` +
+          `Edit instructions: ${editPrompt}${contextNote}${inputSizeNote}\n\n` +
           `Respond with ONLY NDJSON patch lines. ` +
           `Each line: {"description":"...","search":"exact_verbatim_html_substring","replace":"replacement"}`,
       },
@@ -1076,13 +1205,30 @@ export async function surgicalEditWebsite(
       } catch { /* ignore */ }
     }
 
-    // Fallback to full rewrite if no patches applied
+    // Fallback to full rewrite if no patches applied — use compressed source + capped output
     if (patchCount === 0) {
-      await editWebsite(apiKey, currentSourceCode, editPrompt, {
-        onChunk,
-        onDone: (code) => onDone(code, 0),
-        onError,
-      }, conversationHistory);
+      // Use a capped rewrite to avoid 30-45s full regeneration
+      const fallbackMessages: Array<{ role: string; content: string }> = [
+        { role: 'system', content: EDIT_SYSTEM_PROMPT },
+        ...(conversationHistory ? conversationHistory.slice(-6) : []),
+        {
+          role: 'user',
+          content:
+            `Here is the current HTML website to edit:\n\n${currentSourceCode}\n\n` +
+            `━━━ EDIT REQUEST ━━━\n${editPrompt}\n\n` +
+            `━━━ EDIT RULES ━━━\n` +
+            `• Apply ONLY the requested change — do NOT rewrite other sections\n` +
+            `• Preserve all existing CSS variables, fonts, and design tokens\n` +
+            `• Return the COMPLETE updated HTML starting with <!DOCTYPE html>.\n` +
+            `• Keep it as close to the original as possible — minimal changes only.`,
+        },
+      ];
+      let fbAccumulated = await streamOnce(effectiveKey, fallbackMessages, 0.5, onChunk, 30000);
+      let fbCode = stripFences(fbAccumulated);
+      if (!isHtmlComplete(fbCode)) {
+        fbCode = fbCode + '\n</body></html>';
+      }
+      onDone(stripToDoctype(fbCode), 0);
       return;
     }
 
