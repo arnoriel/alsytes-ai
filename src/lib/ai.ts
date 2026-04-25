@@ -1,10 +1,5 @@
 import { ENV } from './env';
 
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// SYSTEM PROMPT — ALSYTES ADVANCED v3
-// ═══════════════════════════════════════════════════════════════════════════════
-
 export const SYSTEM_PROMPT = `You are Alsytes — the world's most advanced AI website and web app builder. You combine elite creative direction, senior full-stack engineering, and award-winning UI/UX design into every output.
 
 Your ONLY task is to generate complete, self-contained, fully functional HTML files based on user descriptions. Every output must feel like it was built by a top-tier agency charging $50,000+.
@@ -17,8 +12,8 @@ STRICT OUTPUT RULES
 3. Everything in ONE file — inline CSS (<style>) and JS (<script>) only
 4. CDN libraries allowed via <script src> or <link href> (Tailwind, GSAP, Three.js, Chart.js, etc.)
 5. If user provides image/video URLs — use them EXACTLY as-is in <img src="..."> tags
-6. If no media provided — use Picsum Photos URLs (format below) — they ALWAYS render
-7. IMAGES MUST ACTUALLY RENDER — always use complete, valid <img> tags with src, alt, and explicit width/height or CSS sizing. Never leave src empty or use placeholder URLs
+6. If no media provided — use LoremFlickr URLs (format below) — they ALWAYS render with CONTEXTUALLY CORRECT images
+7. IMAGES MUST ACTUALLY RENDER AND MATCH CONTENT — always use complete, valid <img> tags with src, alt, and explicit width/height or CSS sizing. Never leave src empty or use placeholder URLs
 8. Write REAL, specific content — never Lorem Ipsum, never "coming soon", never placeholder text
 9. Every single button, form, link, and interaction must work
 10. ZERO SYNTAX ERRORS — validate all HTML tags are properly closed, all JS brackets/braces matched, all CSS rules terminated with semicolons
@@ -109,7 +104,7 @@ EXPLICIT DESIGN INSTRUCTIONS:
 
 IMAGE/MEDIA REFERENCES:
   User-provided URLs → use EXACTLY as-is, never substitute
-  "foto X" / "gambar X" → pick a relevant Picsum seed word that matches the topic
+  "foto X" / "gambar X" → pick a relevant LoremFlickr keyword that matches the topic
 
 COMBINATION HANDLING:
   Users often give multiple signals → honor ALL of them, resolve conflicts with best judgment
@@ -180,45 +175,111 @@ REQUIRED TOOL BEHAVIOR:
 ═══════════════════════════════════════
 LANDING PAGE MODE
 ═══════════════════════════════════════
-IMAGE RULES — CRITICAL: IMAGES MUST ALWAYS RENDER
-  Use Picsum Photos — free, open source, always online, no API key needed.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+IMAGE RULES — CRITICAL: IMAGES MUST MATCH WEBSITE CONTEXT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  FORMAT FOR <img> TAGS:
-    <img src="https://picsum.photos/seed/{SEED}/{WIDTH}/{HEIGHT}" alt="description" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">
+IMPORTANT PRINCIPLE: Before choosing any image URL, ask yourself "Does this keyword produce photos of [the website topic]?" 
+A fitness website MUST show gym/workout images. A restaurant MUST show food/dining images. A tech startup MUST show office/tech images.
 
-  FORMAT FOR CSS background-image:
-    background-image: url('https://picsum.photos/seed/{SEED}/{WIDTH}/{HEIGHT}');
+USE LoremFlickr — free, open source, KEYWORD-FILTERED (returns actual photos matching the keyword from Flickr):
 
-  SEED WORD SELECTION — pick a seed word that matches the image topic:
-    Technology / SaaS    → seed: technology, digital, code, software, server, data, network
-    Business / Corporate → seed: business, office, meeting, professional, team, corporate
-    People / Portrait    → seed: people, person, portrait, woman, man, team
-    Architecture         → seed: architecture, building, interior, room, space, urban
-    Nature / Outdoor     → seed: nature, forest, mountain, ocean, sky, landscape, garden
-    Food / Restaurant    → seed: food, restaurant, meal, coffee, cooking, kitchen
-    Fashion / Lifestyle  → seed: fashion, lifestyle, style, model, clothing
-    Health / Fitness     → seed: fitness, health, sport, workout, wellness, yoga
-    Abstract / Dark      → seed: abstract, dark, texture, pattern, minimal, gradient
-    Product / Commerce   → seed: product, ecommerce, shopping, minimal, studio
-    City / Travel        → seed: city, travel, street, urban, skyline, destination
-    Luxury / Premium     → seed: luxury, elegant, premium, gold, marble, sophistication
+FORMAT FOR <img> TAGS:
+  <img src="https://loremflickr.com/{WIDTH}/{HEIGHT}/{KEYWORD}" alt="description" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">
 
-  RECOMMENDED SIZES:
-    Hero banner    → 1400/800 or 1600/900
-    Feature cards  → 800/500 or 600/400
-    Team avatars   → 200/200 or 400/400
-    Gallery items  → 600/450 or 800/600
-    Testimonial    → 100/100 (square for avatars)
-    Section bg     → 1600/900
+FORMAT FOR CSS background-image:
+  background-image: url('https://loremflickr.com/{WIDTH}/{HEIGHT}/{KEYWORD}');
 
-  EXAMPLE CORRECT USAGE:
-    <img src="https://picsum.photos/seed/technology/1400/800" alt="Modern technology workspace" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">
-    <img src="https://picsum.photos/seed/team/400/400" alt="Team member" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" loading="lazy" onerror="this.style.display='none'">
+FALLBACK (if you need a second source):
+  <img src="https://loremflickr.com/{WIDTH}/{HEIGHT}/{KEYWORD},{KEYWORD2}/all" ...>
+  (comma-separated keywords = must match ALL keywords, more specific)
 
-  NEVER USE:
-    ✗ https://images.unsplash.com/... (requires API key, often 403s)
-    ✗ <img src="#"> or <img src="placeholder.jpg"> or src=""
-    ✗ Empty or broken image URLs of any kind
+━━━ KEYWORD SELECTION BY WEBSITE TYPE — MANDATORY ━━━
+You MUST use keywords from the appropriate category below. Using wrong keywords = broken design.
+
+FITNESS / GYM / WORKOUT / SPORT:
+  → Keywords: gym, weightlifting, fitness, workout, exercise, running, yoga, crossfit, bodybuilding, athlete, strength, dumbbell, treadmill, martial-arts, swimming, cycling, pilates
+
+FOOD / RESTAURANT / CAFE / KULINER:
+  → Keywords: food, restaurant, meal, dining, cooking, chef, cuisine, burger, pizza, sushi, pasta, coffee, cafe, bakery, dessert, plate, breakfast, bbq, seafood, steak, salad, noodles, indonesian-food
+
+TECHNOLOGY / STARTUP / SAAS / APP:
+  → Keywords: technology, laptop, coding, software, startup, innovation, developer, server, datacenter, programming, workspace, monitor, office-tech
+
+BUSINESS / CORPORATE / CONSULTING:
+  → Keywords: business, office, meeting, professional, corporate, team, conference, handshake, boardroom, strategy, finance, briefcase
+
+FASHION / CLOTHING / APPAREL:
+  → Keywords: fashion, clothing, style, model, outfit, runway, boutique, accessories, shoes, streetwear, designer
+
+HEALTH / MEDICAL / WELLNESS:
+  → Keywords: healthcare, medical, wellness, hospital, doctor, therapy, meditation, spa, skincare, nutrition, pharmacy
+
+REAL ESTATE / PROPERTY / ARCHITECTURE:
+  → Keywords: architecture, interior, living-room, bedroom, house, apartment, modern-home, luxury-home, real-estate, kitchen, bathroom, villa
+
+TRAVEL / TOURISM / HOSPITALITY / HOTEL:
+  → Keywords: travel, tourism, hotel, resort, beach, mountain, destination, vacation, tropical, city, landmark, adventure, landscape
+
+EDUCATION / E-LEARNING / COURSE:
+  → Keywords: education, studying, classroom, library, university, learning, books, student, teacher, graduation
+
+BEAUTY / SALON / SPA / COSMETICS:
+  → Keywords: beauty, salon, makeup, skincare, spa, cosmetics, hairstyle, nail, facial, luxury-spa
+
+AUTOMOTIVE / CAR / MOTORCYCLE:
+  → Keywords: automotive, car, luxury-car, sports-car, motorcycle, vehicle, dealership, driving
+
+MUSIC / ENTERTAINMENT / EVENT:
+  → Keywords: music, concert, guitar, studio, festival, performance, entertainment, dj, band, stage
+
+LAW / LEGAL / FINANCE / BANKING:
+  → Keywords: law, legal, finance, banking, courthouse, contract, investment, insurance, accounting
+
+PHOTOGRAPHY / CREATIVE AGENCY:
+  → Keywords: photography, camera, creative, studio, portrait, art, design, gallery, exhibition
+
+NATURE / ENVIRONMENTAL / GREEN:
+  → Keywords: nature, forest, garden, green, eco, sustainability, plants, outdoors, landscape, botanical
+
+KIDS / BABY / PARENTING:
+  → Keywords: baby, children, kids, toddler, family, playground, toys, nursery, parenting
+
+PET / VETERINARY / ANIMAL:
+  → Keywords: dog, cat, pet, veterinary, animal, puppy, kitten, wildlife
+
+GENERAL / UNKNOWN:
+  → Keywords: lifestyle, people, professional, workspace, modern, abstract
+
+━━━ RECOMMENDED SIZES ━━━
+  Hero banner    → 1400/800 or 1600/900
+  Feature cards  → 800/500 or 600/400
+  Team avatars   → 200/200 or 400/400 (add ?lock=1, ?lock=2 etc for unique faces)
+  Gallery items  → 600/450 or 800/600
+  Testimonial    → 100/100 (square for avatars)
+  Section bg     → 1600/900
+
+FOR TEAM/PERSON AVATARS — use specific person keywords + lock parameter for unique faces:
+  <img src="https://loremflickr.com/200/200/person?lock=1" ...>
+  <img src="https://loremflickr.com/200/200/person?lock=2" ...>
+  <img src="https://loremflickr.com/200/200/person?lock=3" ...>
+
+EXAMPLE CORRECT USAGE (fitness website):
+  Hero:  <img src="https://loremflickr.com/1400/800/gym" alt="Modern gym interior" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">
+  Card:  <img src="https://loremflickr.com/800/500/workout" alt="Workout session" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">
+  Avatar:<img src="https://loremflickr.com/100/100/person?lock=1" alt="Trainer" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" loading="lazy" onerror="this.style.display='none'">
+
+EXAMPLE CORRECT USAGE (restaurant website):
+  Hero:  <img src="https://loremflickr.com/1400/800/restaurant" alt="Restaurant interior" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">
+  Food:  <img src="https://loremflickr.com/800/500/food" alt="Delicious meal" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">
+  Dish:  <img src="https://loremflickr.com/600/400/meal" alt="Signature dish" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">
+
+NEVER USE:
+  ✗ https://picsum.photos/... (seeds are random hashes — NOT topic-filtered, images will be wrong)
+  ✗ https://images.unsplash.com/... (requires API key, often 403s)
+  ✗ <img src="#"> or <img src="placeholder.jpg"> or src=""
+  ✗ Wrong-context keywords (e.g., using "technology" keyword on a restaurant website)
+  ✗ Empty or broken image URLs of any kind
 
 REQUIRED SECTIONS (all must be present, fully coded — MINIMUM 12 sections):
   1. STICKY NAVBAR — logo, nav links, CTA button, mobile hamburger; transparent → frosted glass on scroll
@@ -385,6 +446,7 @@ DENSITY CHECKLIST — before finishing, verify:
   ✅ Content is specific, realistic, and contextually appropriate
   ✅ Design is cohesive — one aesthetic direction executed consistently
   ✅ Zero comments anywhere in the output
+  ✅ ALL images use LoremFlickr with CONTEXTUALLY CORRECT keywords for this specific website type
 
 ═══════════════════════════════════════
 QUALITY FINAL CHECK
@@ -396,13 +458,10 @@ Every output must be ALL of these:
   → Complete — no half-finished sections, no TODOs in comments
   → Contextually appropriate — fits the user's industry and audience
   → 2025-quality — modern patterns, current aesthetics, not dated
+  → Images match the website topic 100% — a fitness site shows gym photos, restaurant shows food photos
 
 Think: "Would a senior engineer at a top design agency be proud to ship this?"
 If not — add more. Polish more. Make it better.`;
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// SUMMARY PROMPT — ADVANCED
-// ═══════════════════════════════════════════════════════════════════════════════
 
 const SUMMARY_SYSTEM_PROMPT = `You are Alsytes — a friendly AI website builder. You just finished generating a complete website or web app for the user.
 
@@ -423,10 +482,6 @@ RULES:
 - Total: 150-250 words
 - NO markdown headers with # — use **bold** for section titles only`;
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// EDIT SYSTEM PROMPT — ADVANCED
-// ═══════════════════════════════════════════════════════════════════════════════
-
 export const EDIT_SYSTEM_PROMPT = `You are Alsytes — an elite frontend engineer specializing in precise, high-quality edits to existing HTML websites.
 
 Your task: receive an existing HTML file + edit request → return the COMPLETE updated HTML.
@@ -438,7 +493,7 @@ STRICT OUTPUT RULES:
 4. Preserve everything not explicitly requested to change
 5. ZERO SYNTAX ERRORS — close all tags, match all brackets, terminate all CSS with semicolons
 6. ZERO CODE COMMENTS — do NOT write HTML <!-- -->, JS // or /* */, or CSS /* */ comments anywhere. Pure executable code only.
-7. IMAGES: preserve all existing image URLs; if adding new images use complete Picsum URLs: https://picsum.photos/seed/{SEED}/{WIDTH}/{HEIGHT} with onerror="this.style.display='none';"
+7. IMAGES: preserve all existing image URLs; if adding new images use LoremFlickr: https://loremflickr.com/{WIDTH}/{HEIGHT}/{KEYWORD} with onerror="this.style.display='none';" — keyword MUST match the website's topic/industry
 
 EDIT QUALITY RULES:
 - Match the existing design language exactly (same fonts, same color variables, same border-radius)
@@ -454,10 +509,6 @@ USER INTENT RULES:
 - "fix X" → fix the root cause, not just the symptom
 - "make it more X" → apply the aesthetic quality throughout
 - If the request is ambiguous, make the most useful interpretation`;
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// SURGICAL EDIT PROMPT
-// ═══════════════════════════════════════════════════════════════════════════════
 
 export const SURGICAL_EDIT_SYSTEM_PROMPT = `You are a surgical HTML editor. Produce the minimum targeted patches to fulfill the edit request.
 
@@ -480,11 +531,7 @@ ACCURACY RULES — patches must apply cleanly:
 4. Patches applied top-to-bottom — never overlap patch ranges
 5. Preserve all existing CSS variables, fonts, and design language in replacements
 6. ZERO CODE COMMENTS in replace values — pure executable HTML/CSS/JS only
-7. If adding images: use Picsum URLs https://picsum.photos/seed/{SEED}/{WIDTH}/{HEIGHT}, never empty src`;
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// TYPES
-// ═══════════════════════════════════════════════════════════════════════════════
+7. If adding images: use LoremFlickr https://loremflickr.com/{WIDTH}/{HEIGHT}/{KEYWORD} — keyword MUST match the website's topic/industry (never use picsum)`;
 
 export interface CreditPackage {
   id: string;
@@ -516,10 +563,6 @@ export interface SurgicalEditCallbacks {
   onDone: (finalCode: string, patchCount: number) => void;
   onError: (err: string) => void;
 }
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// GEMINI API LAYER
-// ═══════════════════════════════════════════════════════════════════════════════
 
 const GEMMA_BASE = 'https://generativelanguage.googleapis.com/v1beta';
 const MAX_CONTINUATIONS = 1;
@@ -641,9 +684,214 @@ function resolveKey(apiKey: string | undefined): string {
   return ENV.apiKey ?? apiKey ?? localStorage.getItem('alsytes_gemma_key') ?? '';
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// PUBLIC API
-// ═══════════════════════════════════════════════════════════════════════════════
+// ─── CONTEXT-AWARE IMAGE KEYWORD DETECTION ─────────────────────────────────
+
+interface ImageContext {
+  primaryKeywords: string[];
+  avatarKeyword: string;
+  heroKeyword: string;
+  galleryKeywords: string[];
+  contextLabel: string;
+}
+
+function detectImageContext(prompt: string): ImageContext {
+  const p = prompt.toLowerCase();
+
+  const contexts: Array<{ triggers: string[]; ctx: ImageContext }> = [
+    {
+      triggers: ['fitness', 'gym', 'workout', 'exercise', 'sport', 'olahraga', 'kebugaran', 'latihan', 'yoga', 'pilates', 'crossfit', 'bodybuilding', 'atletik', 'lari', 'renang', 'sepeda', 'martial'],
+      ctx: {
+        primaryKeywords: ['gym', 'fitness', 'workout', 'exercise', 'weightlifting', 'strength'],
+        avatarKeyword: 'athlete',
+        heroKeyword: 'gym',
+        galleryKeywords: ['workout', 'fitness', 'gym', 'exercise', 'running', 'yoga'],
+        contextLabel: 'FITNESS/GYM',
+      },
+    },
+    {
+      triggers: ['restaurant', 'restoran', 'food', 'makanan', 'kuliner', 'cafe', 'kafe', 'coffee', 'kopi', 'bakery', 'roti', 'pizza', 'burger', 'sushi', 'steak', 'seafood', 'catering', 'dining', 'bistro', 'warung', 'rumah makan'],
+      ctx: {
+        primaryKeywords: ['food', 'restaurant', 'meal', 'dining', 'cuisine', 'cooking'],
+        avatarKeyword: 'chef',
+        heroKeyword: 'restaurant',
+        galleryKeywords: ['food', 'meal', 'cuisine', 'cooking', 'restaurant', 'chef'],
+        contextLabel: 'FOOD/RESTAURANT',
+      },
+    },
+    {
+      triggers: ['technology', 'teknologi', 'startup', 'saas', 'software', 'app', 'aplikasi', 'coding', 'developer', 'programming', 'digital agency', 'web development', 'mobile app', 'cloud', 'ai', 'machine learning', 'blockchain', 'fintech'],
+      ctx: {
+        primaryKeywords: ['technology', 'laptop', 'coding', 'software', 'startup', 'innovation'],
+        avatarKeyword: 'developer',
+        heroKeyword: 'technology',
+        galleryKeywords: ['technology', 'coding', 'software', 'startup', 'laptop', 'innovation'],
+        contextLabel: 'TECHNOLOGY/STARTUP',
+      },
+    },
+    {
+      triggers: ['fashion', 'pakaian', 'baju', 'clothing', 'apparel', 'butik', 'boutique', 'style', 'mode', 'streetwear', 'luxury brand', 'tas', 'sepatu', 'accessories', 'outfit'],
+      ctx: {
+        primaryKeywords: ['fashion', 'clothing', 'style', 'model', 'outfit', 'boutique'],
+        avatarKeyword: 'model',
+        heroKeyword: 'fashion',
+        galleryKeywords: ['fashion', 'clothing', 'style', 'outfit', 'model', 'accessories'],
+        contextLabel: 'FASHION/CLOTHING',
+      },
+    },
+    {
+      triggers: ['hotel', 'resort', 'villa', 'travel', 'wisata', 'pariwisata', 'tourism', 'vacation', 'holiday', 'liburan', 'destination', 'trip', 'adventure', 'backpacker', 'hospitality'],
+      ctx: {
+        primaryKeywords: ['hotel', 'resort', 'travel', 'tourism', 'destination', 'vacation'],
+        avatarKeyword: 'traveler',
+        heroKeyword: 'hotel',
+        galleryKeywords: ['travel', 'destination', 'hotel', 'resort', 'landscape', 'vacation'],
+        contextLabel: 'TRAVEL/HOSPITALITY',
+      },
+    },
+    {
+      triggers: ['real estate', 'property', 'properti', 'rumah', 'apartemen', 'apartment', 'house', 'housing', 'interior', 'arsitektur', 'architecture', 'kos', 'kontrakan', 'gedung'],
+      ctx: {
+        primaryKeywords: ['architecture', 'interior', 'house', 'apartment', 'real-estate', 'living-room'],
+        avatarKeyword: 'professional',
+        heroKeyword: 'architecture',
+        galleryKeywords: ['interior', 'architecture', 'house', 'apartment', 'living-room', 'modern-home'],
+        contextLabel: 'REAL ESTATE/PROPERTY',
+      },
+    },
+    {
+      triggers: ['health', 'kesehatan', 'medical', 'medis', 'klinik', 'clinic', 'hospital', 'rumah sakit', 'dokter', 'doctor', 'wellness', 'spa', 'skincare', 'beauty', 'salon', 'kecantikan', 'perawatan'],
+      ctx: {
+        primaryKeywords: ['healthcare', 'wellness', 'spa', 'beauty', 'medical', 'therapy'],
+        avatarKeyword: 'doctor',
+        heroKeyword: 'wellness',
+        galleryKeywords: ['wellness', 'healthcare', 'spa', 'beauty', 'meditation', 'skincare'],
+        contextLabel: 'HEALTH/WELLNESS',
+      },
+    },
+    {
+      triggers: ['education', 'pendidikan', 'sekolah', 'school', 'universitas', 'university', 'kursus', 'course', 'belajar', 'learning', 'e-learning', 'training', 'les', 'bimbel', 'tutor'],
+      ctx: {
+        primaryKeywords: ['education', 'studying', 'classroom', 'library', 'learning', 'university'],
+        avatarKeyword: 'teacher',
+        heroKeyword: 'education',
+        galleryKeywords: ['education', 'studying', 'classroom', 'library', 'student', 'learning'],
+        contextLabel: 'EDUCATION',
+      },
+    },
+    {
+      triggers: ['business', 'bisnis', 'corporate', 'korporat', 'consulting', 'konsultan', 'finance', 'keuangan', 'investment', 'investasi', 'insurance', 'asuransi', 'accounting', 'law', 'hukum', 'legal'],
+      ctx: {
+        primaryKeywords: ['business', 'office', 'corporate', 'professional', 'meeting', 'finance'],
+        avatarKeyword: 'professional',
+        heroKeyword: 'business',
+        galleryKeywords: ['business', 'office', 'meeting', 'corporate', 'professional', 'finance'],
+        contextLabel: 'BUSINESS/CORPORATE',
+      },
+    },
+    {
+      triggers: ['automotive', 'mobil', 'car', 'motor', 'motorcycle', 'otomotif', 'kendaraan', 'vehicle', 'dealer', 'bengkel', 'garage', 'rental mobil', 'taksi'],
+      ctx: {
+        primaryKeywords: ['automotive', 'car', 'sports-car', 'vehicle', 'driving', 'luxury-car'],
+        avatarKeyword: 'professional',
+        heroKeyword: 'automotive',
+        galleryKeywords: ['car', 'automotive', 'luxury-car', 'sports-car', 'vehicle', 'driving'],
+        contextLabel: 'AUTOMOTIVE',
+      },
+    },
+    {
+      triggers: ['music', 'musik', 'concert', 'konser', 'band', 'artis', 'entertainment', 'hiburan', 'event', 'festival', 'dj', 'studio', 'recording'],
+      ctx: {
+        primaryKeywords: ['music', 'concert', 'festival', 'performance', 'entertainment', 'studio'],
+        avatarKeyword: 'musician',
+        heroKeyword: 'concert',
+        galleryKeywords: ['music', 'concert', 'performance', 'festival', 'studio', 'entertainment'],
+        contextLabel: 'MUSIC/ENTERTAINMENT',
+      },
+    },
+    {
+      triggers: ['photography', 'foto', 'fotografer', 'photographer', 'creative agency', 'agensi kreatif', 'desainer', 'designer', 'portofolio', 'portfolio', 'art', 'seni', 'gallery', 'galeri'],
+      ctx: {
+        primaryKeywords: ['photography', 'camera', 'creative', 'studio', 'art', 'gallery'],
+        avatarKeyword: 'photographer',
+        heroKeyword: 'photography',
+        galleryKeywords: ['photography', 'portrait', 'creative', 'art', 'studio', 'gallery'],
+        contextLabel: 'PHOTOGRAPHY/CREATIVE',
+      },
+    },
+    {
+      triggers: ['pet', 'hewan', 'anjing', 'kucing', 'dog', 'cat', 'veterinary', 'vet', 'animal', 'grooming', 'petshop'],
+      ctx: {
+        primaryKeywords: ['dog', 'cat', 'pet', 'veterinary', 'animal', 'puppy'],
+        avatarKeyword: 'veterinarian',
+        heroKeyword: 'pet',
+        galleryKeywords: ['dog', 'cat', 'pet', 'puppy', 'kitten', 'animal'],
+        contextLabel: 'PET/VETERINARY',
+      },
+    },
+    {
+      triggers: ['nature', 'alam', 'eco', 'green', 'hijau', 'environmental', 'lingkungan', 'organic', 'pertanian', 'farm', 'garden', 'kebun', 'botanical', 'plant', 'tanaman'],
+      ctx: {
+        primaryKeywords: ['nature', 'forest', 'garden', 'green', 'eco', 'plants'],
+        avatarKeyword: 'person',
+        heroKeyword: 'nature',
+        galleryKeywords: ['nature', 'garden', 'forest', 'plants', 'outdoor', 'landscape'],
+        contextLabel: 'NATURE/ECO',
+      },
+    },
+  ];
+
+  for (const { triggers, ctx } of contexts) {
+    if (triggers.some(trigger => p.includes(trigger))) {
+      return ctx;
+    }
+  }
+
+  return {
+    primaryKeywords: ['lifestyle', 'professional', 'modern', 'workspace', 'people'],
+    avatarKeyword: 'person',
+    heroKeyword: 'lifestyle',
+    galleryKeywords: ['lifestyle', 'professional', 'modern', 'workspace', 'people'],
+    contextLabel: 'GENERAL',
+  };
+}
+
+function buildImageInstructions(imageCtx: ImageContext): string {
+  const { primaryKeywords, avatarKeyword, heroKeyword, galleryKeywords, contextLabel } = imageCtx;
+
+  return `━━━ MANDATORY IMAGE INSTRUCTIONS — ${contextLabel} WEBSITE ━━━
+This is a ${contextLabel} website. ALL images MUST use LoremFlickr with keywords from this specific context.
+NEVER use Picsum Photos (seeds are random, not topic-filtered).
+
+APPROVED KEYWORDS FOR THIS WEBSITE:
+  Primary keywords: ${primaryKeywords.join(', ')}
+  Hero image keyword: "${heroKeyword}"
+  Gallery/showcase keywords: ${galleryKeywords.join(', ')}
+  Avatar/person keyword: "${avatarKeyword}"
+
+LOREMFLICKR FORMAT (use this EXACTLY):
+  Hero/large: <img src="https://loremflickr.com/1400/800/${heroKeyword}" alt="..." style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">
+  Cards:      <img src="https://loremflickr.com/800/500/${primaryKeywords[0]}" alt="..." style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">
+  Gallery 1:  <img src="https://loremflickr.com/600/450/${galleryKeywords[0]}" ...>
+  Gallery 2:  <img src="https://loremflickr.com/600/450/${galleryKeywords[1] || galleryKeywords[0]}" ...>
+  Gallery 3:  <img src="https://loremflickr.com/600/450/${galleryKeywords[2] || galleryKeywords[0]}" ...>
+  Avatars:    <img src="https://loremflickr.com/100/100/${avatarKeyword}?lock=1" ...>  (use ?lock=1, ?lock=2, ?lock=3 for unique faces)
+
+SECTION-BY-SECTION IMAGE GUIDE:
+  → HERO SECTION: use keyword "${heroKeyword}"
+  → SHOWCASE/ALTERNATING BLOCKS: rotate through ${galleryKeywords.slice(0, 3).join(', ')}
+  → TESTIMONIAL AVATARS: use "${avatarKeyword}?lock=1", "${avatarKeyword}?lock=2", "${avatarKeyword}?lock=3", etc.
+  → FEATURE CARDS (if image-based): use "${primaryKeywords[0]}", "${primaryKeywords[1] || primaryKeywords[0]}"
+  → GALLERY GRID: rotate through ${galleryKeywords.join(', ')}
+  → TEAM SECTION: use "${avatarKeyword}?lock=1" through "${avatarKeyword}?lock=6"
+
+STRICTLY FORBIDDEN:
+  ✗ https://picsum.photos/... — DO NOT USE, images will be random and wrong
+  ✗ https://images.unsplash.com/... — requires API key, will 403
+  ✗ Any keyword NOT related to ${contextLabel} topic
+  ✗ Generic keywords like "abstract", "minimal", "pattern" when topic-specific keywords exist`;
+}
+
+// ─── PUBLIC API ─────────────────────────────────────────────────────────────
 
 export async function generateWebsite(
   apiKey: string | undefined,
@@ -712,7 +960,8 @@ export async function generateWebsite(
             `• A bonus section that wasn't in the original (comparison table, timeline, stats breakdown, team grid, or process steps)\n` +
             `• Richer footer with more links and a newsletter form\n\n` +
             `Continue the HTML exactly from where it left off (after the last closing tag above) and write at least ${(MIN_TARGET_CHARS - cleanedCode.length).toLocaleString()} more characters before closing with </body></html>.\n\n` +
-            `REMINDER: Zero comments — pure executable code only.`,
+            `REMINDER: Zero comments — pure executable code only.\n` +
+            `REMINDER: Continue using LoremFlickr with contextually correct keywords — NEVER use Picsum.`,
         },
       ];
 
@@ -733,15 +982,19 @@ function buildGenerationPrompt(userPrompt: string): string {
   const styleSignals = extractStyleSignals(userPrompt);
   const styleBlock = styleSignals.length > 0
     ? `━━━ USER STYLE PREFERENCES DETECTED ━━━\n` +
-      `The user\'s prompt contains explicit style signals. Honor ALL of these:\n` +
+      `The user's prompt contains explicit style signals. Honor ALL of these:\n` +
       styleSignals.map(s => `  → ${s}`).join('\n') + '\n' +
       `These override your default aesthetic choices — execute them at the highest possible quality.\n\n`
     : '';
+
+  const imageCtx = detectImageContext(userPrompt);
+  const imageInstructions = buildImageInstructions(imageCtx);
 
   return (
     `Build a complete, fully functional, visually extraordinary website or web app based on this description:\n\n` +
     `"${userPrompt}"\n\n` +
     styleBlock +
+    `${imageInstructions}\n\n` +
     `━━━ GENERATION PROCESS ━━━\n\n` +
     `STEP 1 — CLASSIFY: Identify which mode (Game / App+Tool / Landing Page)\n` +
     `STEP 2 — SCAN STYLE SIGNALS: Check the prompt for color, font, mood, vibe, or reference site mentions\n` +
@@ -755,8 +1008,8 @@ function buildGenerationPrompt(userPrompt: string): string {
     `CRITICAL RULES — ZERO TOLERANCE:\n` +
     `• ZERO SYNTAX ERRORS — close every HTML tag, match every JS {bracket}, terminate every CSS rule with ;\n` +
     `• ZERO CODE COMMENTS — no HTML <!-- -->, no JS // or /* */, no CSS /* */ anywhere in the output. Every token must be working code.\n` +
-    `• IMAGES MUST RENDER — use Picsum Photos: https://picsum.photos/seed/{SEED}/{WIDTH}/{HEIGHT} — always works, no API key needed. NEVER use Unsplash URLs.\n` +
-    `• Add onerror="this.style.display=\'none\';" to every <img> tag as safety net\n` +
+    `• IMAGES MUST MATCH CONTEXT — use LoremFlickr as instructed above. NEVER use Picsum Photos.\n` +
+    `• Add onerror="this.style.display='none';" to every <img> tag as safety net\n` +
     `• MUST start with <!DOCTYPE html> and end with </html>\n` +
     `• MUST import Google Fonts via @import in <style>\n` +
     `• MUST define all design tokens as CSS custom properties in :root\n` +
@@ -1006,6 +1259,7 @@ function buildEditPrompt(currentSourceCode: string, editPrompt: string): string 
     `• Keep all existing animations and interactions intact\n` +
     `• Output MUST be a complete HTML document ending with </body></html>\n` +
     `• ZERO CODE COMMENTS — no HTML <!-- -->, JS //, or CSS /* */ anywhere\n` +
+    `• IMAGES: use LoremFlickr (https://loremflickr.com/W/H/keyword) — NEVER Picsum\n` +
     `• Return ONLY the complete updated HTML starting with <!DOCTYPE html>.`
   );
 }
@@ -1119,7 +1373,7 @@ export async function surgicalEditWebsite(
           `Edit instructions: ${editPrompt}${contextNote}${inputSizeNote}\n\n` +
           `Respond with ONLY NDJSON patch lines. ` +
           `Each line: {"description":"...","search":"exact_verbatim_html_substring","replace":"replacement"}\n` +
-          `IMPORTANT: "replace" values must contain ZERO code comments.`,
+          `IMPORTANT: "replace" values must contain ZERO code comments. Use LoremFlickr (not Picsum) for any new images.`,
       },
     ];
 
@@ -1194,6 +1448,7 @@ export async function surgicalEditWebsite(
             `• Apply ONLY the requested change — do NOT rewrite other sections\n` +
             `• Preserve all existing CSS variables, fonts, and design tokens\n` +
             `• ZERO CODE COMMENTS — no HTML <!-- -->, JS //, or CSS /* */ anywhere\n` +
+            `• IMAGES: use LoremFlickr (https://loremflickr.com/W/H/keyword) — NEVER Picsum\n` +
             `• Return the COMPLETE updated HTML starting with <!DOCTYPE html>.\n` +
             `• Keep it as close to the original as possible — minimal changes only.`,
         },
