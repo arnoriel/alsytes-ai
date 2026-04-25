@@ -17,11 +17,12 @@ STRICT OUTPUT RULES
 3. Everything in ONE file — inline CSS (<style>) and JS (<script>) only
 4. CDN libraries allowed via <script src> or <link href> (Tailwind, GSAP, Three.js, Chart.js, etc.)
 5. If user provides image/video URLs — use them EXACTLY as-is in <img src="..."> tags
-6. If no media provided — use real working Unsplash URLs with the photo IDs listed below
+6. If no media provided — use Picsum Photos URLs (format below) — they ALWAYS render
 7. IMAGES MUST ACTUALLY RENDER — always use complete, valid <img> tags with src, alt, and explicit width/height or CSS sizing. Never leave src empty or use placeholder URLs
 8. Write REAL, specific content — never Lorem Ipsum, never "coming soon", never placeholder text
 9. Every single button, form, link, and interaction must work
 10. ZERO SYNTAX ERRORS — validate all HTML tags are properly closed, all JS brackets/braces matched, all CSS rules terminated with semicolons
+11. ZERO CODE COMMENTS — do NOT write any HTML comments (<!-- -->), JS comments (// or /* */), or CSS comments (/* */) anywhere in the output. Every token must be executable code, not commentary. Comments waste your output budget and reduce the richness of the final result.
 
 ═══════════════════════════════════════
 STEP 1: INTENT CLASSIFICATION
@@ -108,7 +109,7 @@ EXPLICIT DESIGN INSTRUCTIONS:
 
 IMAGE/MEDIA REFERENCES:
   User-provided URLs → use EXACTLY as-is, never substitute
-  "foto X" / "gambar X" → if Unsplash has a relevant match, use it; otherwise describe the ideal image in an alt tag
+  "foto X" / "gambar X" → pick a relevant Picsum seed word that matches the topic
 
 COMBINATION HANDLING:
   Users often give multiple signals → honor ALL of them, resolve conflicts with best judgment
@@ -179,31 +180,45 @@ REQUIRED TOOL BEHAVIOR:
 ═══════════════════════════════════════
 LANDING PAGE MODE
 ═══════════════════════════════════════
-IMAGE RULES — CRITICAL FOR IMAGES TO ACTUALLY RENDER:
-  ALWAYS use complete <img> tags:
-    <img src="https://images.unsplash.com/photo-{ID}?w=1400&q=85&auto=format&fit=crop" alt="description" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
-  NEVER: empty src, placeholder src, or broken URLs
-  NEVER: <img src="#"> or <img src="placeholder.jpg"> or src=""
-  Add onerror handler to all images: onerror="this.style.display='none'"
-  For background images use CSS: background-image: url('https://images.unsplash.com/photo-{ID}?w=1400&q=85&auto=format&fit=crop')
+IMAGE RULES — CRITICAL: IMAGES MUST ALWAYS RENDER
+  Use Picsum Photos — free, open source, always online, no API key needed.
 
-UNSPLASH IMAGE FORMAT:
-  https://images.unsplash.com/photo-{ID}?w=1400&q=85&auto=format&fit=crop
+  FORMAT FOR <img> TAGS:
+    <img src="https://picsum.photos/seed/{SEED}/{WIDTH}/{HEIGHT}" alt="description" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">
 
-CURATED PHOTO IDs BY CATEGORY:
-  Architecture:  1486325212991, 1512917774080, 1460317442301, 1558618666, 1600585154340
-  Luxury:        1441986300917, 1505740420928, 1523275335683, 1549439602, 1519710164239
-  Technology:    1518770660439, 1461749076, 1498050694836, 1504384308, 1551434678
-  Business:      1497366216548, 1454165205029, 1521737604782, 1560179406, 1551836522
-  People/Team:   1573496359142, 1507003211169, 1519085360753, 1573497019940, 1580489944975
-  Nature:        1500534407945, 1469474968028, 1506905489134, 1441974537330, 1426604522
-  Food:          1546069901, 1567620905, 1414235, 1482049614, 1504674671
-  Fashion:       1469334031925, 1506152387, 1488161953, 1515886633, 1529139522
-  Health/Fit:    1544367577, 1512290923, 1518611483823, 1498682, 1559757148
-  City/Urban:    1480714378702, 1477959858617, 1519501025264, 1486325212991, 1477088790
-  Abstract Dark: 1419242902523, 1451187580, 1557683316855, 1542281286, 1534796636
-  Interior:      1555041536045, 1600210061050, 1524758369, 1560185, 1556909144
-  Product:       1523275335683, 1472851916, 1526170, 1556556984, 1503808
+  FORMAT FOR CSS background-image:
+    background-image: url('https://picsum.photos/seed/{SEED}/{WIDTH}/{HEIGHT}');
+
+  SEED WORD SELECTION — pick a seed word that matches the image topic:
+    Technology / SaaS    → seed: technology, digital, code, software, server, data, network
+    Business / Corporate → seed: business, office, meeting, professional, team, corporate
+    People / Portrait    → seed: people, person, portrait, woman, man, team
+    Architecture         → seed: architecture, building, interior, room, space, urban
+    Nature / Outdoor     → seed: nature, forest, mountain, ocean, sky, landscape, garden
+    Food / Restaurant    → seed: food, restaurant, meal, coffee, cooking, kitchen
+    Fashion / Lifestyle  → seed: fashion, lifestyle, style, model, clothing
+    Health / Fitness     → seed: fitness, health, sport, workout, wellness, yoga
+    Abstract / Dark      → seed: abstract, dark, texture, pattern, minimal, gradient
+    Product / Commerce   → seed: product, ecommerce, shopping, minimal, studio
+    City / Travel        → seed: city, travel, street, urban, skyline, destination
+    Luxury / Premium     → seed: luxury, elegant, premium, gold, marble, sophistication
+
+  RECOMMENDED SIZES:
+    Hero banner    → 1400/800 or 1600/900
+    Feature cards  → 800/500 or 600/400
+    Team avatars   → 200/200 or 400/400
+    Gallery items  → 600/450 or 800/600
+    Testimonial    → 100/100 (square for avatars)
+    Section bg     → 1600/900
+
+  EXAMPLE CORRECT USAGE:
+    <img src="https://picsum.photos/seed/technology/1400/800" alt="Modern technology workspace" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">
+    <img src="https://picsum.photos/seed/team/400/400" alt="Team member" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" loading="lazy" onerror="this.style.display='none'">
+
+  NEVER USE:
+    ✗ https://images.unsplash.com/... (requires API key, often 403s)
+    ✗ <img src="#"> or <img src="placeholder.jpg"> or src=""
+    ✗ Empty or broken image URLs of any kind
 
 REQUIRED SECTIONS (all must be present, fully coded — MINIMUM 12 sections):
   1. STICKY NAVBAR — logo, nav links, CTA button, mobile hamburger; transparent → frosted glass on scroll
@@ -245,15 +260,14 @@ CSS EXCELLENCE STANDARDS
 ═══════════════════════════════════════
 MANDATORY CSS ARCHITECTURE:
   :root {
-    /* Design tokens — ALL values as variables */
-    --color-bg: ...;         /* page background */
-    --color-surface: ...;    /* card/panel background */
-    --color-border: ...;     /* default border */
+    --color-bg: ...;
+    --color-surface: ...;
+    --color-border: ...;
     --color-text-primary: ...;
     --color-text-secondary: ...;
-    --color-accent: ...;     /* primary brand accent */
+    --color-accent: ...;
     --color-accent-hover: ...;
-    --color-accent-2: ...;   /* secondary accent */
+    --color-accent-2: ...;
     --radius-sm: 6px;
     --radius-md: 12px;
     --radius-lg: 20px;
@@ -286,10 +300,10 @@ MINIMUM 5 UNIQUE @keyframes ANIMATIONS:
 
 RESPONSIVE BREAKPOINTS:
   Mobile first. All layouts mobile by default.
-  @media (min-width: 640px)  { /* sm */ }
-  @media (min-width: 768px)  { /* md */ }
-  @media (min-width: 1024px) { /* lg */ }
-  @media (min-width: 1280px) { /* xl */ }
+  @media (min-width: 640px)  { }
+  @media (min-width: 768px)  { }
+  @media (min-width: 1024px) { }
+  @media (min-width: 1280px) { }
 
 ═══════════════════════════════════════
 JS EXCELLENCE STANDARDS
@@ -354,6 +368,12 @@ CHARACTER COUNT MANDATE:
   → Deepen every JS function with more logic and edge case handling
   You are NOT done until you have written at minimum 50,000 characters.
 
+NO COMMENTS TOKEN BUDGET RULE:
+  Do NOT write any comments anywhere in the output. Not HTML <!-- -->, not JS // or /* */, not CSS /* */.
+  Every single character of output must be executable code.
+  Comments consume your generation budget without adding any visual or functional value.
+  The 65,000 token budget is for CODE, not explanations of the code.
+
 DENSITY CHECKLIST — before finishing, verify:
   ✅ Every section has unique visual treatment (no two sections look the same)
   ✅ At least 8 distinct hover/interaction states across the page
@@ -364,6 +384,7 @@ DENSITY CHECKLIST — before finishing, verify:
   ✅ No placeholder or "coming soon" content anywhere
   ✅ Content is specific, realistic, and contextually appropriate
   ✅ Design is cohesive — one aesthetic direction executed consistently
+  ✅ Zero comments anywhere in the output
 
 ═══════════════════════════════════════
 QUALITY FINAL CHECK
@@ -416,7 +437,8 @@ STRICT OUTPUT RULES:
 3. Return the ENTIRE file, not just changed sections
 4. Preserve everything not explicitly requested to change
 5. ZERO SYNTAX ERRORS — close all tags, match all brackets, terminate all CSS with semicolons
-6. IMAGES: preserve all existing image URLs; if adding new images use complete Unsplash URLs with onerror="this.style.display='none';"
+6. ZERO CODE COMMENTS — do NOT write HTML <!-- -->, JS // or /* */, or CSS /* */ comments anywhere. Pure executable code only.
+7. IMAGES: preserve all existing image URLs; if adding new images use complete Picsum URLs: https://picsum.photos/seed/{SEED}/{WIDTH}/{HEIGHT} with onerror="this.style.display='none';"
 
 EDIT QUALITY RULES:
 - Match the existing design language exactly (same fonts, same color variables, same border-radius)
@@ -457,7 +479,8 @@ ACCURACY RULES — patches must apply cleanly:
 3. "replace" is the COMPLETE replacement for that exact "search" string
 4. Patches applied top-to-bottom — never overlap patch ranges
 5. Preserve all existing CSS variables, fonts, and design language in replacements
-6. If adding images: use complete Unsplash URLs, never empty src`;
+6. ZERO CODE COMMENTS in replace values — pure executable HTML/CSS/JS only
+7. If adding images: use Picsum URLs https://picsum.photos/seed/{SEED}/{WIDTH}/{HEIGHT}, never empty src`;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -499,17 +522,12 @@ export interface SurgicalEditCallbacks {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const GEMMA_BASE = 'https://generativelanguage.googleapis.com/v1beta';
-// Gemini 2.5 Flash rarely truncates at 65k tokens — keep 1 as safety net
 const MAX_CONTINUATIONS = 1;
-
-// ─── HTML completeness check ─────────────────────────────────────────────────
 
 function isHtmlComplete(html: string): boolean {
   const trimmed = html.trimEnd().toLowerCase();
   return trimmed.endsWith('</html>');
 }
-
-// ─── Strip markdown fences ────────────────────────────────────────────────────
 
 function stripFences(text: string): string {
   const t = text.trim();
@@ -519,8 +537,6 @@ function stripFences(text: string): string {
   return t;
 }
 
-// ─── Safety net: strip thinking leak before <!DOCTYPE html> ──────────────────
-
 function stripToDoctype(text: string): string {
   const idx = text.indexOf('<!DOCTYPE');
   if (idx > 0) return text.slice(idx);
@@ -528,8 +544,6 @@ function stripToDoctype(text: string): string {
   if (htmlIdx > 0) return text.slice(htmlIdx);
   return text;
 }
-
-// ─── Convert messages to Gemini native payload ────────────────────────────────
 
 function toGemmaPayload(
   messages: Array<{ role: string; content: string }>,
@@ -556,8 +570,6 @@ function toGemmaPayload(
   };
 }
 
-// ─── Extract non-thought text delta from Gemini SSE chunk ─────────────────────
-
 function extractGemmaDelta(jsonStr: string): string {
   try {
     const json = JSON.parse(jsonStr);
@@ -571,8 +583,6 @@ function extractGemmaDelta(jsonStr: string): string {
     return '';
   }
 }
-
-// ─── Core streaming call ──────────────────────────────────────────────────────
 
 async function streamOnce(
   effectiveKey: string,
@@ -627,8 +637,6 @@ async function streamOnce(
   return fullText;
 }
 
-// ─── Resolve API key ──────────────────────────────────────────────────────────
-
 function resolveKey(apiKey: string | undefined): string {
   return ENV.apiKey ?? apiKey ?? localStorage.getItem('alsytes_gemma_key') ?? '';
 }
@@ -636,8 +644,6 @@ function resolveKey(apiKey: string | undefined): string {
 // ═══════════════════════════════════════════════════════════════════════════════
 // PUBLIC API
 // ═══════════════════════════════════════════════════════════════════════════════
-
-// ─── generateWebsite ──────────────────────────────────────────────────────────
 
 export async function generateWebsite(
   apiKey: string | undefined,
@@ -661,7 +667,6 @@ export async function generateWebsite(
       },
     ];
 
-    // 65k tokens — Gemini 2.5 Flash virtually never truncates
     let accumulated = await streamOnce(effectiveKey, initialMessages, 0.85, onChunk, 65000);
     let cleanedCode = stripFences(accumulated);
 
@@ -687,10 +692,8 @@ export async function generateWebsite(
       cleanedCode = stripFences(cleanedCode + continuation);
     }
 
-    // ── Expansion pass: if output is complete but too short (< 45k chars), request more content ──
     const MIN_TARGET_CHARS = 45000;
     if (isHtmlComplete(cleanedCode) && cleanedCode.length < MIN_TARGET_CHARS) {
-      // Strip the closing tags so we can append more content
       const withoutClose = cleanedCode.replace(/<\/body>\s*<\/html>\s*$/i, '').trimEnd();
 
       const expansionMessages: Array<{ role: string; content: string }> = [
@@ -708,13 +711,13 @@ export async function generateWebsite(
             `• More JavaScript interactivity (tooltips, tabs, smooth effects)\n` +
             `• A bonus section that wasn't in the original (comparison table, timeline, stats breakdown, team grid, or process steps)\n` +
             `• Richer footer with more links and a newsletter form\n\n` +
-            `Continue the HTML exactly from where it left off (after the last closing tag above) and write at least ${(MIN_TARGET_CHARS - cleanedCode.length).toLocaleString()} more characters before closing with </body></html>.`,
+            `Continue the HTML exactly from where it left off (after the last closing tag above) and write at least ${(MIN_TARGET_CHARS - cleanedCode.length).toLocaleString()} more characters before closing with </body></html>.\n\n` +
+            `REMINDER: Zero comments — pure executable code only.`,
         },
       ];
 
       const expansion = await streamOnce(effectiveKey, expansionMessages, 0.85, onChunk, 40000);
       const expandedCode = withoutClose + '\n' + stripFences(expansion);
-      // Ensure it closes properly
       cleanedCode = isHtmlComplete(expandedCode)
         ? expandedCode
         : expandedCode + '\n</body></html>';
@@ -751,7 +754,8 @@ function buildGenerationPrompt(userPrompt: string): string {
     `• Landing → all 9 sections, IntersectionObserver scroll reveal, animated counters, accordion FAQ\n\n` +
     `CRITICAL RULES — ZERO TOLERANCE:\n` +
     `• ZERO SYNTAX ERRORS — close every HTML tag, match every JS {bracket}, terminate every CSS rule with ;\n` +
-    `• IMAGES MUST RENDER — every <img> needs a complete Unsplash URL, never empty src or placeholder\n` +
+    `• ZERO CODE COMMENTS — no HTML <!-- -->, no JS // or /* */, no CSS /* */ anywhere in the output. Every token must be working code.\n` +
+    `• IMAGES MUST RENDER — use Picsum Photos: https://picsum.photos/seed/{SEED}/{WIDTH}/{HEIGHT} — always works, no API key needed. NEVER use Unsplash URLs.\n` +
     `• Add onerror="this.style.display=\'none\';" to every <img> tag as safety net\n` +
     `• MUST start with <!DOCTYPE html> and end with </html>\n` +
     `• MUST import Google Fonts via @import in <style>\n` +
@@ -765,6 +769,7 @@ function buildGenerationPrompt(userPrompt: string): string {
     `━━━ FINAL LENGTH MANDATE — READ THIS LAST ━━━\n` +
     `You MUST write a MINIMUM of 50,000 characters of HTML/CSS/JS code.\n` +
     `That is roughly 1,500+ lines. This is NOT optional.\n` +
+    `Because you are writing ZERO COMMENTS, every character counts as real code — use that budget to build more sections, more features, more polish.\n` +
     `If you finish all sections and are under 50,000 chars — DO NOT close </html> yet.\n` +
     `Instead, continue by adding:\n` +
     `  • More items to existing sections (more testimonials, more FAQ, more features)\n` +
@@ -777,10 +782,6 @@ function buildGenerationPrompt(userPrompt: string): string {
   );
 }
 
-/**
- * Scans the user prompt for explicit style/design signals and returns
- * a list of human-readable instructions for the model to follow.
- */
 function extractStyleSignals(prompt: string): string[] {
   const signals: string[] = [];
   const p = prompt.toLowerCase();
@@ -896,8 +897,6 @@ function extractStyleSignals(prompt: string): string[] {
   return signals;
 }
 
-// ─── generateWebsiteSummary ───────────────────────────────────────────────────
-
 export async function generateWebsiteSummary(
   apiKey: string | undefined,
   userPrompt: string,
@@ -937,8 +936,6 @@ export async function generateWebsiteSummary(
   }
 }
 
-// ─── editWebsite (full rewrite edit) with conversation history ────────────────
-
 export async function editWebsite(
   apiKey: string | undefined,
   currentSourceCode: string,
@@ -956,7 +953,7 @@ export async function editWebsite(
 
   try {
     const historyMessages: Array<{ role: string; content: string }> = conversationHistory
-      ? conversationHistory.slice(-6) // Keep last 3 turns (6 messages) for context
+      ? conversationHistory.slice(-6)
       : [];
 
     const initialMessages: Array<{ role: string; content: string }> = [
@@ -1008,27 +1005,20 @@ function buildEditPrompt(currentSourceCode: string, editPrompt: string): string 
     `• Preserve all existing functionality unless asked to change it\n` +
     `• Keep all existing animations and interactions intact\n` +
     `• Output MUST be a complete HTML document ending with </body></html>\n` +
+    `• ZERO CODE COMMENTS — no HTML <!-- -->, JS //, or CSS /* */ anywhere\n` +
     `• Return ONLY the complete updated HTML starting with <!DOCTYPE html>.`
   );
 }
 
-// ─── HTML compressor for edit context (reduces input tokens ~40%) ─────────────
-
 function compressHtmlForEdit(html: string): string {
   return html
-    // Strip HTML comments
     .replace(/<!--[\s\S]*?-->/g, '')
-    // Collapse long SVG path data (d="M...") to a short placeholder — never edited by AI
     .replace(/\s+d="[^"]{120,}"/g, ' d="[PATH]"')
-    // Truncate base64 data URIs — massive token consumers
     .replace(/(data:[^;]+;base64,)[A-Za-z0-9+/=]{80,}/g, '$1[BASE64]')
-    // Collapse runs of whitespace (preserve single spaces and single newlines)
     .replace(/[ \t]+/g, ' ')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 }
-
-// ─── surgicalEditWebsite with conversation history ────────────────────────────
 
 export async function surgicalEditWebsite(
   apiKey: string | undefined,
@@ -1045,18 +1035,14 @@ export async function surgicalEditWebsite(
     return;
   }
 
-  // ── Fuzzy patch application (5 strategies, most to least strict) ─────────────
   function applyPatch(code: string, patch: EditPatch): { code: string; success: boolean } {
-    // 1. Exact match
     if (code.includes(patch.search)) {
       return { code: code.replace(patch.search, patch.replace), success: true };
     }
-    // 2. Normalize line endings
     const crNorm = patch.search.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     if (code.includes(crNorm)) {
       return { code: code.replace(crNorm, patch.replace), success: true };
     }
-    // 3. Trim surrounding whitespace on the search string
     const trimmed = patch.search.trim();
     if (trimmed.length >= 40) {
       const idx = code.indexOf(trimmed);
@@ -1064,27 +1050,22 @@ export async function surgicalEditWebsite(
         return { code: code.slice(0, idx) + patch.replace + code.slice(idx + trimmed.length), success: true };
       }
     }
-    // 4. Collapse internal whitespace runs (model may have compacted spaces)
     const wsCollapsed = patch.search.replace(/\s+/g, ' ').trim();
     if (wsCollapsed.length >= 40) {
-      // Try to find a region in code that also collapses to the same string
       const codeCollapsed = code.replace(/\s+/g, ' ');
       const colIdx = codeCollapsed.indexOf(wsCollapsed);
       if (colIdx !== -1) {
-        // Map collapsed index back to original code by counting chars
         let origIdx = 0, colCount = 0;
         while (colCount < colIdx && origIdx < code.length) {
           if (code[origIdx] !== ' ' || codeCollapsed[colCount] === ' ') colCount++;
           origIdx++;
         }
-        // Find end of the match region
         let origEnd = origIdx;
         let colSearchCount = 0;
         while (colSearchCount < wsCollapsed.length && origEnd < code.length) {
           if (code[origEnd] !== ' ' || colSearchCount < wsCollapsed.length) colSearchCount++;
           origEnd++;
         }
-        // Fallback: use a simpler extraction — find the first unique word from the search
         const firstWord = wsCollapsed.slice(0, 40);
         const simpleIdx = code.indexOf(firstWord);
         if (simpleIdx !== -1) {
@@ -1092,14 +1073,12 @@ export async function surgicalEditWebsite(
         }
       }
     }
-    // 5. Key-anchor search: find a unique 25-char anchor from the middle of search string
     if (patch.search.length >= 60) {
       const midStart = Math.floor(patch.search.length / 2) - 12;
       const anchor = patch.search.slice(midStart, midStart + 25).trim();
       if (anchor.length >= 20) {
         const anchorIdx = code.indexOf(anchor);
         if (anchorIdx !== -1) {
-          // Find the broader match by expanding from anchor
           const searchStart = Math.max(0, anchorIdx - midStart);
           const region = code.slice(searchStart, searchStart + patch.search.length + 50);
           if (region.replace(/\s+/g, ' ').includes(wsCollapsed.slice(0, 30))) {
@@ -1114,7 +1093,6 @@ export async function surgicalEditWebsite(
     return { code, success: false };
   }
 
-  // Build context-aware prompt if we have history
   const contextNote = conversationHistory && conversationHistory.length > 0
     ? `\n\nCONVERSATION CONTEXT (previous edits to this page):\n` +
       conversationHistory
@@ -1124,7 +1102,6 @@ export async function surgicalEditWebsite(
       `\n\nUse this context to understand the design direction when making the current edit.`
     : '';
 
-  // Compress source for the prompt context to reduce input tokens ~40%
   const compressedSource = compressHtmlForEdit(currentSourceCode);
   const inputSizeNote = currentSourceCode.length > 30000
     ? `\n\nNOTE: Source shown here is whitespace-compressed for brevity (${compressedSource.length} chars). ` +
@@ -1141,7 +1118,8 @@ export async function surgicalEditWebsite(
           `HTML file to edit:\n\`\`\`html\n${compressedSource}\n\`\`\`\n\n` +
           `Edit instructions: ${editPrompt}${contextNote}${inputSizeNote}\n\n` +
           `Respond with ONLY NDJSON patch lines. ` +
-          `Each line: {"description":"...","search":"exact_verbatim_html_substring","replace":"replacement"}`,
+          `Each line: {"description":"...","search":"exact_verbatim_html_substring","replace":"replacement"}\n` +
+          `IMPORTANT: "replace" values must contain ZERO code comments.`,
       },
     ];
 
@@ -1178,14 +1156,12 @@ export async function surgicalEditWebsite(
             }
             onPatch(patch, currentCode, result.success);
           } catch {
-            // Not valid JSON yet — skip
           }
         }
       },
       16000
     );
 
-    // Process remaining buffer
     const remaining = lineBuffer.trim();
     if (remaining) {
       try {
@@ -1202,12 +1178,10 @@ export async function surgicalEditWebsite(
           }
           onPatch(patch, currentCode, result.success);
         }
-      } catch { /* ignore */ }
+      } catch { }
     }
 
-    // Fallback to full rewrite if no patches applied — use compressed source + capped output
     if (patchCount === 0) {
-      // Use a capped rewrite to avoid 30-45s full regeneration
       const fallbackMessages: Array<{ role: string; content: string }> = [
         { role: 'system', content: EDIT_SYSTEM_PROMPT },
         ...(conversationHistory ? conversationHistory.slice(-6) : []),
@@ -1219,6 +1193,7 @@ export async function surgicalEditWebsite(
             `━━━ EDIT RULES ━━━\n` +
             `• Apply ONLY the requested change — do NOT rewrite other sections\n` +
             `• Preserve all existing CSS variables, fonts, and design tokens\n` +
+            `• ZERO CODE COMMENTS — no HTML <!-- -->, JS //, or CSS /* */ anywhere\n` +
             `• Return the COMPLETE updated HTML starting with <!DOCTYPE html>.\n` +
             `• Keep it as close to the original as possible — minimal changes only.`,
         },
@@ -1245,8 +1220,6 @@ export async function surgicalEditWebsite(
     }
   }
 }
-
-// ─── extractWebsiteName ───────────────────────────────────────────────────────
 
 export function extractWebsiteName(prompt: string): string {
   const words = prompt
