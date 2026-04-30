@@ -809,7 +809,7 @@ export interface SurgicalEditCallbacks {
 }
 
 const GEMMA_BASE = 'https://generativelanguage.googleapis.com/v1beta';
-const MAX_CONTINUATIONS = 1;
+const MAX_CONTINUATIONS = 3;
 
 function isHtmlComplete(html: string): boolean {
   const trimmed = html.trimEnd().toLowerCase();
@@ -1202,7 +1202,7 @@ export async function generateWebsite(
       cleanedCode = trimAfterHtml(stripFences(cleanedCode + continuation));
     }
 
-    const MIN_TARGET_CHARS = 45000;
+    const MIN_TARGET_CHARS = 50000;
     if (isHtmlComplete(cleanedCode) && cleanedCode.length < MIN_TARGET_CHARS) {
       const withoutClose = cleanedCode.replace(/<\/body>\s*<\/html>\s*$/i, '').trimEnd();
 
