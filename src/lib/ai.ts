@@ -18,6 +18,7 @@ STRICT OUTPUT RULES
 9. Every single button, form, link, and interaction must work
 10. ZERO SYNTAX ERRORS — validate all HTML tags are properly closed, all JS brackets/braces matched, all CSS rules terminated with semicolons
 11. ZERO CODE COMMENTS — do NOT write any HTML comments (<!-- -->), JS comments (// or /* */), or CSS comments (/* */) anywhere in the output. Every token must be executable code, not commentary. Comments waste your output budget and reduce the richness of the final result.
+12. DOCUMENT STRUCTURE IS SACRED — every section, script, and style tag MUST appear inside <body>. NEVER write any HTML, <script>, or <style> after the closing </body></html> tags. The document ends at </html> with zero content after it.
 
 ═══════════════════════════════════════
 STEP 1: INTENT CLASSIFICATION
@@ -236,8 +237,11 @@ MUSIC / ENTERTAINMENT / EVENT:
 LAW / LEGAL / FINANCE / BANKING:
   → Keywords: law, legal, finance, banking, courthouse, contract, investment, insurance, accounting
 
-PHOTOGRAPHY / CREATIVE AGENCY:
-  → Keywords: photography, camera, creative, studio, portrait, art, design, gallery, exhibition
+CREATIVE AGENCY / BRANDING / DESIGN STUDIO:
+  → Keywords: photography, camera, creative, studio, portrait, art, design, gallery, exhibition, workspace, minimal
+
+PHOTOGRAPHY / PORTFOLIO:
+  → Keywords: photography, camera, portrait, art, gallery, exhibition, creative, studio
 
 NATURE / ENVIRONMENTAL / GREEN:
   → Keywords: nature, forest, garden, green, eco, sustainability, plants, outdoors, landscape, botanical
@@ -295,9 +299,14 @@ REQUIRED SECTIONS (all must be present, fully coded — MINIMUM 12 sections):
   11. FINAL CTA SECTION — bold full-width conversion section, email input, headline, subtext, trust badges
   12. FOOTER — 4-column layout: product links, company links, social icons, newsletter form; copyright, legal links
 
+SECTION ORDER IS MANDATORY:
+  All sections must appear in the order listed above, sequentially inside <body>.
+  Bonus sections (timeline, team grid, stats bar, case study) go BETWEEN section 10 and 11.
+  The FOOTER is always last. </body></html> closes everything — nothing follows.
+
 REQUIRED ANIMATIONS:
   1. Hero entrance: staggered translateY(40px) → 0 + opacity 0 → 1, each child 100ms delayed
-  2. Scroll reveal: IntersectionObserver threshold:0.12, adds 'visible' class → CSS transition fires
+  2. Scroll reveal: ONE IntersectionObserver initialized inside a single DOMContentLoaded listener. All .fade-up elements across the entire page — including bonus sections — must be observed by this single instance. Never create a second observer in a separate <script> block.
   3. Stat counters: count from 0 to target over 1.5s (easeOutExpo curve) when scrolled into view
   4. Navbar glass: window.scrollY > 60 → add class with backdrop-filter: blur(16px) + semi-transparent bg
   5. Button hover: scale(1.04) + box-shadow depth increase + color shift (all in CSS transition)
@@ -375,12 +384,12 @@ CODE QUALITY REQUIREMENTS:
   - Destructuring for readability
   - Optional chaining (?.) for safe property access
   - Template literals for all string interpolation
-  - DOMContentLoaded wrapper for all initialization
+  - ONE DOMContentLoaded wrapper for ALL initialization — never split JS initialization across multiple DOMContentLoaded listeners or multiple <script> blocks that each set up their own observers/listeners
   - No global state pollution — use IIFE or module pattern if needed
 
 PERFORMANCE:
   - Debounce resize handlers: let resizeTimer; window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(fn, 150); })
-  - IntersectionObserver instead of scroll events for reveal animations
+  - ONE IntersectionObserver instance for all scroll-reveal elements — initialize once, observe all .fade-up targets in a single querySelectorAll pass
   - requestAnimationFrame for all smooth animations (never CSS transitions on layout properties)
   - Event delegation: document.addEventListener('click', e => { if (e.target.matches('.btn')) {...} })
 
@@ -425,7 +434,7 @@ CHARACTER COUNT MANDATE:
   → Add more features and interactivity to existing sections
   → Add richer micro-animations and hover states
   → Add more testimonials, FAQ items, feature cards, team members
-  → Add a bonus section (comparison table, process steps, stats breakdown, gallery)
+  → Add a bonus section (comparison table, process steps, stats breakdown, gallery) — place it BEFORE the final CTA
   → Deepen every JS function with more logic and edge case handling
   You are NOT done until you have written at minimum 50,000 characters.
 
@@ -447,6 +456,8 @@ DENSITY CHECKLIST — before finishing, verify:
   ✅ Design is cohesive — one aesthetic direction executed consistently
   ✅ Zero comments anywhere in the output
   ✅ ALL images use LoremFlickr with CONTEXTUALLY CORRECT keywords for this specific website type
+  ✅ All sections are inside <body> — nothing written after </body></html>
+  ✅ Only ONE IntersectionObserver and ONE DOMContentLoaded — no duplicates
 
 ═══════════════════════════════════════
 QUALITY FINAL CHECK
@@ -459,6 +470,7 @@ Every output must be ALL of these:
   → Contextually appropriate — fits the user's industry and audience
   → 2025-quality — modern patterns, current aesthetics, not dated
   → Images match the website topic 100% — a fitness site shows gym photos, restaurant shows food photos
+  → Structurally valid — </body></html> is the absolute last line, nothing after it
 
 Think: "Would a senior engineer at a top design agency be proud to ship this?"
 If not — add more. Polish more. Make it better.`;
@@ -494,18 +506,19 @@ STRICT OUTPUT RULES:
 5. ZERO SYNTAX ERRORS — close all tags, match all brackets, terminate all CSS with semicolons
 6. ZERO CODE COMMENTS — do NOT write HTML <!-- -->, JS // or /* */, or CSS /* */ comments anywhere. Pure executable code only.
 7. IMAGES: preserve all existing image URLs; if adding new images use LoremFlickr: https://loremflickr.com/{WIDTH}/{HEIGHT}/{KEYWORD} with onerror="this.style.display='none';" — keyword MUST match the website's topic/industry
+8. DOCUMENT STRUCTURE: all new sections and scripts go inside <body>. </body></html> is the final line — zero content after it.
 
 EDIT QUALITY RULES:
 - Match the existing design language exactly (same fonts, same color variables, same border-radius)
 - If adding new sections/components, use the same CSS variable tokens already defined in :root
-- If adding new JS, use the same code style and patterns already in the file
+- If adding new JS, use the same code style and patterns already in the file — append to the existing DOMContentLoaded listener, never create a second one
 - Never downgrade quality — the edit should feel seamless, indistinguishable from the original
 - Maintain mobile responsiveness after every change
 - Never break existing functionality
 
 USER INTENT RULES:
 - "change X to Y" → change only that, preserve everything else
-- "add X" → add it in the most contextually appropriate location
+- "add X" → add it in the most contextually appropriate location inside <body>
 - "fix X" → fix the root cause, not just the symptom
 - "make it more X" → apply the aesthetic quality throughout
 - If the request is ambiguous, make the most useful interpretation`;
@@ -531,7 +544,8 @@ ACCURACY RULES — patches must apply cleanly:
 4. Patches applied top-to-bottom — never overlap patch ranges
 5. Preserve all existing CSS variables, fonts, and design language in replacements
 6. ZERO CODE COMMENTS in replace values — pure executable HTML/CSS/JS only
-7. If adding images: use LoremFlickr https://loremflickr.com/{WIDTH}/{HEIGHT}/{KEYWORD} — keyword MUST match the website's topic/industry (never use picsum)`;
+7. If adding images: use LoremFlickr https://loremflickr.com/{WIDTH}/{HEIGHT}/{KEYWORD} — keyword MUST match the website's topic/industry (never use picsum)
+8. New sections in "replace" must land inside <body> — never after </body> or </html>`;
 
 export interface CreditPackage {
   id: string;
@@ -586,6 +600,18 @@ function stripToDoctype(text: string): string {
   const htmlIdx = text.indexOf('<html');
   if (htmlIdx > 0) return text.slice(htmlIdx);
   return text;
+}
+
+/**
+ * Trims any stray content written after </body></html>.
+ * Models occasionally append extra sections outside the document — this
+ * post-processes the output so the browser always gets a valid document.
+ */
+function trimAfterHtml(html: string): string {
+  const lower = html.toLowerCase();
+  const closeIdx = lower.lastIndexOf('</html>');
+  if (closeIdx === -1) return html;
+  return html.slice(0, closeIdx + '</html>'.length);
 }
 
 function toGemmaPayload(
@@ -799,7 +825,7 @@ function detectImageContext(prompt: string): ImageContext {
       },
     },
     {
-      triggers: ['music', 'musik', 'concert', 'konser', 'band', 'artis', 'entertainment', 'hiburan', 'event', 'festival', 'dj', 'studio', 'recording'],
+      triggers: ['music', 'musik', 'concert', 'konser', 'band', 'artis', 'entertainment', 'hiburan', 'event', 'festival', 'dj', 'studio recording', 'label musik'],
       ctx: {
         primaryKeywords: ['music', 'concert', 'festival', 'performance', 'entertainment', 'studio'],
         avatarKeyword: 'musician',
@@ -809,7 +835,23 @@ function detectImageContext(prompt: string): ImageContext {
       },
     },
     {
-      triggers: ['photography', 'foto', 'fotografer', 'photographer', 'creative agency', 'agensi kreatif', 'desainer', 'designer', 'portofolio', 'portfolio', 'art', 'seni', 'gallery', 'galeri'],
+      // PATCH 2: dedicated CREATIVE_AGENCY context — checked before PHOTOGRAPHY so branding/studio
+      // prompts don't fall through to the generic photography bucket or GENERAL fallback
+      triggers: [
+        'creative agency', 'agensi kreatif', 'branding studio', 'design studio', 'studio kreatif',
+        'creative direction', 'art direction', 'brand identity', 'visual identity', 'branding agency',
+        'creative house', 'motion studio', 'ad agency', 'advertising agency',
+      ],
+      ctx: {
+        primaryKeywords: ['photography', 'creative', 'studio', 'art', 'design'],
+        avatarKeyword: 'photographer',
+        heroKeyword: 'creative',
+        galleryKeywords: ['photography', 'studio', 'art', 'design', 'creative', 'workspace'],
+        contextLabel: 'CREATIVE_AGENCY',
+      },
+    },
+    {
+      triggers: ['photography', 'foto', 'fotografer', 'photographer', 'agensi kreatif', 'desainer', 'designer', 'portofolio', 'portfolio', 'art', 'seni', 'gallery', 'galeri'],
       ctx: {
         primaryKeywords: ['photography', 'camera', 'creative', 'studio', 'art', 'gallery'],
         avatarKeyword: 'photographer',
@@ -916,7 +958,7 @@ export async function generateWebsite(
     ];
 
     let accumulated = await streamOnce(effectiveKey, initialMessages, 0.85, onChunk, 65000);
-    let cleanedCode = stripFences(accumulated);
+    let cleanedCode = trimAfterHtml(stripFences(accumulated));
 
     let attempts = 0;
     while (!isHtmlComplete(cleanedCode) && attempts < MAX_CONTINUATIONS) {
@@ -932,12 +974,13 @@ export async function generateWebsite(
             `Your response was cut off before the HTML was complete. ` +
             `Continue EXACTLY from the last character — do NOT repeat any code. ` +
             `The final characters of your last response were: "${cleanedCode.slice(-120)}" ` +
-            `Continue from there and end properly with </body></html>.`,
+            `Continue from there and end properly with </body></html>. ` +
+            `</body></html> must be the very last characters — write nothing after it.`,
         },
       ];
 
       const continuation = await streamOnce(effectiveKey, continuationMessages, 0.5, onChunk, 32000);
-      cleanedCode = stripFences(cleanedCode + continuation);
+      cleanedCode = trimAfterHtml(stripFences(cleanedCode + continuation));
     }
 
     const MIN_TARGET_CHARS = 45000;
@@ -952,24 +995,27 @@ export async function generateWebsite(
           role: 'user',
           content:
             `Your output so far is only ${cleanedCode.length.toLocaleString()} characters — far below the required 50,000 character minimum.\n\n` +
-            `You stopped too early. The website needs significantly more content and polish.\n\n` +
-            `WITHOUT repeating any existing code, continue adding:\n` +
-            `• More richly detailed sections (more cards, more items, deeper content)\n` +
-            `• Additional micro-animations, hover states, and CSS polish\n` +
-            `• More JavaScript interactivity (tooltips, tabs, smooth effects)\n` +
-            `• A bonus section that wasn't in the original (comparison table, timeline, stats breakdown, team grid, or process steps)\n` +
-            `• Richer footer with more links and a newsletter form\n\n` +
-            `Continue the HTML exactly from where it left off (after the last closing tag above) and write at least ${(MIN_TARGET_CHARS - cleanedCode.length).toLocaleString()} more characters before closing with </body></html>.\n\n` +
+            `You stopped too early. Add more depth WITHOUT duplicating sections that already exist above.\n\n` +
+            `DO NOT repeat: navbar, hero, any section already written above.\n` +
+            `DO add (if not already present):\n` +
+            `• A bonus section placed before the final CTA: choose ONE of — comparison table, timeline, stats bar, case study, or team grid\n` +
+            `• More testimonials (add 2-3 more to the existing testimonials section)\n` +
+            `• More FAQ items (add 3-4 more questions to the existing FAQ)\n` +
+            `• Richer micro-animations and CSS hover states\n` +
+            `• More detailed JS interactions (smooth scroll, lazy load, tooltip)\n\n` +
+            `Continue the HTML exactly from where it left off and write at least ${(MIN_TARGET_CHARS - cleanedCode.length).toLocaleString()} more characters before closing with </body></html>.\n\n` +
             `REMINDER: Zero comments — pure executable code only.\n` +
-            `REMINDER: Continue using LoremFlickr with contextually correct keywords — NEVER use Picsum.`,
+            `REMINDER: LoremFlickr only — NEVER Picsum.\n` +
+            `REMINDER: </body></html> is the absolute last line — nothing after it.`,
         },
       ];
 
       const expansion = await streamOnce(effectiveKey, expansionMessages, 0.85, onChunk, 40000);
       const expandedCode = withoutClose + '\n' + stripFences(expansion);
-      cleanedCode = isHtmlComplete(expandedCode)
-        ? expandedCode
-        : expandedCode + '\n</body></html>';
+      const trimmed = trimAfterHtml(expandedCode);
+      cleanedCode = isHtmlComplete(trimmed)
+        ? trimmed
+        : trimmed + '\n</body></html>';
     }
 
     onDone(stripToDoctype(cleanedCode));
@@ -999,22 +1045,25 @@ function buildGenerationPrompt(userPrompt: string): string {
     `STEP 1 — CLASSIFY: Identify which mode (Game / App+Tool / Landing Page)\n` +
     `STEP 2 — SCAN STYLE SIGNALS: Check the prompt for color, font, mood, vibe, or reference site mentions\n` +
     `STEP 3 — LOCK AESTHETIC: If user gave style signals → honor them fully. If not → choose a bold distinct direction (NEVER generic purple-on-white)\n` +
-    `STEP 4 — PLAN: Mentally outline all sections/views/screens before writing a single line\n` +
+    `STEP 4 — PLAN: Mentally outline all sections in order. Every section must land inside <body>. </body></html> is the final line.\n` +
     `STEP 5 — BUILD: Write dense, production-quality code using the FULL 65k token budget\n\n` +
     `MODE-SPECIFIC REMINDERS:\n` +
     `• Game → working rAF game loop, 3+ screens, particle system, Web Audio SFX, mobile touch controls\n` +
     `• App/Tool → full CRUD with localStorage, real working logic, toast notifications, seed data\n` +
-    `• Landing → all 9 sections, IntersectionObserver scroll reveal, animated counters, accordion FAQ\n\n` +
+    `• Landing → all 12 sections in order, single IntersectionObserver for all .fade-up, animated counters, accordion FAQ\n\n` +
     `CRITICAL RULES — ZERO TOLERANCE:\n` +
     `• ZERO SYNTAX ERRORS — close every HTML tag, match every JS {bracket}, terminate every CSS rule with ;\n` +
     `• ZERO CODE COMMENTS — no HTML <!-- -->, no JS // or /* */, no CSS /* */ anywhere in the output. Every token must be working code.\n` +
     `• IMAGES MUST MATCH CONTEXT — use LoremFlickr as instructed above. NEVER use Picsum Photos.\n` +
     `• Add onerror="this.style.display='none';" to every <img> tag as safety net\n` +
     `• MUST start with <!DOCTYPE html> and end with </html>\n` +
+    `• NEVER write any HTML, <script>, or <style> after </body></html> — the document ends there, period\n` +
     `• MUST import Google Fonts via @import in <style>\n` +
     `• MUST define all design tokens as CSS custom properties in :root\n` +
     `• MUST include minimum 5 distinct @keyframe animations\n` +
     `• MUST be fully responsive (375px mobile → 1440px desktop)\n` +
+    `• ONE DOMContentLoaded listener — initialize ALL JS (observer, counters, navbar, accordion, slider) inside it. Never split across multiple listeners or script blocks.\n` +
+    `• ONE IntersectionObserver instance — call querySelectorAll('.fade-up') once and observe all results. Never create a second observer.\n` +
     `• NEVER use Lorem Ipsum — every word must be real and contextually appropriate\n` +
     `• NEVER use emoji as UI icons — use inline SVG paths\n` +
     `• DO NOT stop early or truncate — use the full output budget\n` +
@@ -1029,8 +1078,9 @@ function buildGenerationPrompt(userPrompt: string): string {
     `  • A richer showcase section with more cards or gallery items\n` +
     `  • Additional micro-animations and CSS polish\n` +
     `  • More detailed JS interactions (tooltips, smooth scrolling, lazy loads)\n` +
-    `  • A bonus section (comparison table, timeline, stats, process steps)\n` +
-    `Only close with </body></html> after you have written at least 50,000 characters.\n\n` +
+    `  • A bonus section before the final CTA (comparison table, timeline, stats, process steps, team grid)\n` +
+    `Only close with </body></html> after you have written at least 50,000 characters.\n` +
+    `</body></html> is the very last thing you write — nothing after it.\n\n` +
     `Return ONLY the raw HTML, starting NOW with <!DOCTYPE html>.`
   );
 }
@@ -1074,29 +1124,29 @@ function extractStyleSignals(prompt: string): string[] {
   }
 
   const moodMap: Record<string, string> = {
-    'minimalis':   'STYLE: Ultra-minimal — extreme whitespace, max 2-3 colors, no decorative clutter, typography-first design',
-    'minimal':     'STYLE: Ultra-minimal — extreme whitespace, max 2-3 colors, no decorative clutter, typography-first design',
-    'mewah':       'STYLE: Luxury/premium — Cormorant or Playfair Display, gold/champagne accents, generous spacing, refined thin borders',
-    'luxury':      'STYLE: Luxury/premium — Cormorant or Playfair Display, gold/champagne accents, generous spacing, refined thin borders',
-    'premium':     'STYLE: Luxury/premium — Cormorant or Playfair Display, gold/champagne accents, generous spacing, refined thin borders',
-    'fun':         'STYLE: Playful/fun — Nunito or Fredoka One, saturated multi-color palette, bubbly rounded shapes, bouncy CSS animations',
-    'playful':     'STYLE: Playful/fun — Nunito or Fredoka One, saturated multi-color palette, bubbly rounded shapes, bouncy CSS animations',
-    'lucu':        'STYLE: Playful/fun — Nunito or Fredoka One, saturated multi-color palette, bubbly rounded shapes, bouncy CSS animations',
-    'profesional': 'STYLE: Professional/corporate — clean grid, navy/slate palette, conservative formal typography, trust-building layout',
-    'corporate':   'STYLE: Professional/corporate — clean grid, navy/slate palette, conservative formal typography, trust-building layout',
-    'dark':        'STYLE: Dark theme — background #080B14 to #0D1117, light text, neon/electric accent, glow effects on key elements',
-    'gelap':       'STYLE: Dark theme — background #080B14 to #0D1117, light text, neon/electric accent, glow effects on key elements',
-    'bold':        'STYLE: Bold/strong — font-weight 800-900, high contrast, large-scale type, powerful visual hierarchy',
-    'modern':      'STYLE: Modern/contemporary — geometric sans-serif, sharp angles, asymmetric layout, fresh 2025 web aesthetics',
-    'futuristic':  'STYLE: Futuristic/sci-fi — Orbitron or Exo 2, neon accents, grid lines, glitch effects, deep dark background',
-    'vintage':     'STYLE: Vintage — warm sepia tones, serif typography, aged textures, nostalgic feel',
-    'retro':       'STYLE: Retro — pixel aesthetics or 80s neon, VT323 or Press Start 2P font, CRT scanline effects',
-    'elegant':     'STYLE: Elegant — refined spacing, thin elegant type, muted palette with one luxurious accent, ultra-smooth transitions',
-    'colorful':    'STYLE: Colorful — vibrant multi-color palette, each section with distinct accent, high energy',
-    'clean':       'STYLE: Clean — minimal visual noise, generous whitespace, one accent color, crystal clear hierarchy',
-    'rounded':     'STYLE: Rounded corners everywhere — border-radius 16-24px on cards, pill buttons (border-radius: 999px)',
-    'kawaii':      'STYLE: Kawaii/cute — pastel palette, Nunito font, soft rounded everything, small heart/star decorative elements',
-    'brutalist':   'STYLE: Brutalist — heavy black borders, stark contrast, raw asymmetric layout, Bebas Neue or mono font, zero decorative softness',
+    'minimalis':    'STYLE: Ultra-minimal — extreme whitespace, max 2-3 colors, no decorative clutter, typography-first design',
+    'minimal':      'STYLE: Ultra-minimal — extreme whitespace, max 2-3 colors, no decorative clutter, typography-first design',
+    'mewah':        'STYLE: Luxury/premium — Cormorant or Playfair Display, gold/champagne accents, generous spacing, refined thin borders',
+    'luxury':       'STYLE: Luxury/premium — Cormorant or Playfair Display, gold/champagne accents, generous spacing, refined thin borders',
+    'premium':      'STYLE: Luxury/premium — Cormorant or Playfair Display, gold/champagne accents, generous spacing, refined thin borders',
+    'fun':          'STYLE: Playful/fun — Nunito or Fredoka One, saturated multi-color palette, bubbly rounded shapes, bouncy CSS animations',
+    'playful':      'STYLE: Playful/fun — Nunito or Fredoka One, saturated multi-color palette, bubbly rounded shapes, bouncy CSS animations',
+    'lucu':         'STYLE: Playful/fun — Nunito or Fredoka One, saturated multi-color palette, bubbly rounded shapes, bouncy CSS animations',
+    'profesional':  'STYLE: Professional/corporate — clean grid, navy/slate palette, conservative formal typography, trust-building layout',
+    'corporate':    'STYLE: Professional/corporate — clean grid, navy/slate palette, conservative formal typography, trust-building layout',
+    'dark':         'STYLE: Dark theme — background #080B14 to #0D1117, light text, neon/electric accent, glow effects on key elements',
+    'gelap':        'STYLE: Dark theme — background #080B14 to #0D1117, light text, neon/electric accent, glow effects on key elements',
+    'bold':         'STYLE: Bold/strong — font-weight 800-900, high contrast, large-scale type, powerful visual hierarchy',
+    'modern':       'STYLE: Modern/contemporary — geometric sans-serif, sharp angles, asymmetric layout, fresh 2025 web aesthetics',
+    'futuristic':   'STYLE: Futuristic/sci-fi — Orbitron or Exo 2, neon accents, grid lines, glitch effects, deep dark background',
+    'vintage':      'STYLE: Vintage — warm sepia tones, serif typography, aged textures, nostalgic feel',
+    'retro':        'STYLE: Retro — pixel aesthetics or 80s neon, VT323 or Press Start 2P font, CRT scanline effects',
+    'elegant':      'STYLE: Elegant — refined spacing, thin elegant type, muted palette with one luxurious accent, ultra-smooth transitions',
+    'colorful':     'STYLE: Colorful — vibrant multi-color palette, each section with distinct accent, high energy',
+    'clean':        'STYLE: Clean — minimal visual noise, generous whitespace, one accent color, crystal clear hierarchy',
+    'rounded':      'STYLE: Rounded corners everywhere — border-radius 16-24px on cards, pill buttons (border-radius: 999px)',
+    'kawaii':       'STYLE: Kawaii/cute — pastel palette, Nunito font, soft rounded everything, small heart/star decorative elements',
+    'brutalist':    'STYLE: Brutalist — heavy black borders, stark contrast, raw asymmetric layout, Bebas Neue or mono font, zero decorative softness',
     'glassmorphism':'STYLE: Glassmorphism — frosted glass panels (backdrop-filter: blur), semi-transparent surfaces, gradient backgrounds behind glass',
   };
   for (const [kw, instruction] of Object.entries(moodMap)) {
@@ -1106,21 +1156,21 @@ function extractStyleSignals(prompt: string): string[] {
   }
 
   const brandMap: Record<string, string> = {
-    'apple':      'REFERENCE Apple.com: ultra-minimal, extreme whitespace, product-hero photography, SF-style clean sans-serif, white dominant with one black accent',
-    'notion':     'REFERENCE Notion: soft gray background (#F7F6F3), neutral sans-serif, dense information layout, subtle borders, calm productivity',
-    'stripe':     'REFERENCE Stripe: indigo/slate tech palette, clean fintech typography, gradient hero, polished professional trust-building design',
-    'airbnb':     'REFERENCE Airbnb: warm coral accent (#FF385C), friendly rounded typography, photography-forward, soft approachable UI',
-    'vercel':     'REFERENCE Vercel: pure black/white, monospace elements, stark developer aesthetic, no-nonsense bold typography',
-    'figma':      'REFERENCE Figma: vibrant multi-color (purple/green/red/blue), playful yet professional, strong confident brand',
-    'linear':     'REFERENCE Linear: dark sophisticated (#0F0F10), purple accent, crisp sans-serif, premium feel, smooth micro-animations',
-    'framer':     'REFERENCE Framer: dark aesthetic, bold gradients, playful motion-forward design, creative agency energy',
-    'spotify':    'REFERENCE Spotify: pure black background (#121212), neon green accent (#1DB954), card-based layout, music/entertainment feel',
-    'netflix':    'REFERENCE Netflix: pure black background, bold red accent (#E50914), cinematic dark feel, large imagery, high contrast',
-    'tokopedia':  'REFERENCE Tokopedia: green accent (#03AC0E), clean e-commerce layout, trust-focused, familiar Indonesian marketplace feel',
-    'gojek':      'REFERENCE Gojek: green (#00AA13), friendly rounded typography, approachable super-app design, Indonesian-market optimized',
-    'tiktok':     'REFERENCE TikTok: pure black, neon pink + cyan duotone, bold type, video-forward, Gen-Z energy',
-    'twitter':    'REFERENCE Twitter/X: clean black or white, blue accent (#1D9BF0), minimal chrome, content-first layout',
-    'discord':    'REFERENCE Discord: dark #313338 background, blurple accent (#5865F2), gaming community feel, rounded UI elements',
+    'apple':     'REFERENCE Apple.com: ultra-minimal, extreme whitespace, product-hero photography, SF-style clean sans-serif, white dominant with one black accent',
+    'notion':    'REFERENCE Notion: soft gray background (#F7F6F3), neutral sans-serif, dense information layout, subtle borders, calm productivity',
+    'stripe':    'REFERENCE Stripe: indigo/slate tech palette, clean fintech typography, gradient hero, polished professional trust-building design',
+    'airbnb':    'REFERENCE Airbnb: warm coral accent (#FF385C), friendly rounded typography, photography-forward, soft approachable UI',
+    'vercel':    'REFERENCE Vercel: pure black/white, monospace elements, stark developer aesthetic, no-nonsense bold typography',
+    'figma':     'REFERENCE Figma: vibrant multi-color (purple/green/red/blue), playful yet professional, strong confident brand',
+    'linear':    'REFERENCE Linear: dark sophisticated (#0F0F10), purple accent, crisp sans-serif, premium feel, smooth micro-animations',
+    'framer':    'REFERENCE Framer: dark aesthetic, bold gradients, playful motion-forward design, creative agency energy',
+    'spotify':   'REFERENCE Spotify: pure black background (#121212), neon green accent (#1DB954), card-based layout, music/entertainment feel',
+    'netflix':   'REFERENCE Netflix: pure black background, bold red accent (#E50914), cinematic dark feel, large imagery, high contrast',
+    'tokopedia': 'REFERENCE Tokopedia: green accent (#03AC0E), clean e-commerce layout, trust-focused, familiar Indonesian marketplace feel',
+    'gojek':     'REFERENCE Gojek: green (#00AA13), friendly rounded typography, approachable super-app design, Indonesian-market optimized',
+    'tiktok':    'REFERENCE TikTok: pure black, neon pink + cyan duotone, bold type, video-forward, Gen-Z energy',
+    'twitter':   'REFERENCE Twitter/X: clean black or white, blue accent (#1D9BF0), minimal chrome, content-first layout',
+    'discord':   'REFERENCE Discord: dark #313338 background, blurple accent (#5865F2), gaming community feel, rounded UI elements',
   };
   for (const [kw, instruction] of Object.entries(brandMap)) {
     if (p.includes(kw)) {
@@ -1219,7 +1269,7 @@ export async function editWebsite(
     ];
 
     let accumulated = await streamOnce(effectiveKey, initialMessages, 0.7, onChunk, 65000);
-    let cleanedCode = stripFences(accumulated);
+    let cleanedCode = trimAfterHtml(stripFences(accumulated));
 
     let attempts = 0;
     while (!isHtmlComplete(cleanedCode) && attempts < MAX_CONTINUATIONS) {
@@ -1234,12 +1284,12 @@ export async function editWebsite(
           role: 'user',
           content:
             `Your response was cut off. Continue EXACTLY from: "${cleanedCode.slice(-120)}" ` +
-            `Do NOT repeat code. End with </body></html>.`,
+            `Do NOT repeat code. End with </body></html> — nothing after it.`,
         },
       ];
 
       const continuation = await streamOnce(effectiveKey, continuationMessages, 0.4, onChunk, 32000);
-      cleanedCode = stripFences(cleanedCode + continuation);
+      cleanedCode = trimAfterHtml(stripFences(cleanedCode + continuation));
     }
 
     onDone(stripToDoctype(cleanedCode));
@@ -1257,7 +1307,9 @@ function buildEditPrompt(currentSourceCode: string, editPrompt: string): string 
     `• New elements must match existing design language exactly\n` +
     `• Preserve all existing functionality unless asked to change it\n` +
     `• Keep all existing animations and interactions intact\n` +
+    `• If adding JS: append to the existing DOMContentLoaded listener — never create a second one\n` +
     `• Output MUST be a complete HTML document ending with </body></html>\n` +
+    `• </body></html> is the absolute last line — write nothing after it\n` +
     `• ZERO CODE COMMENTS — no HTML <!-- -->, JS //, or CSS /* */ anywhere\n` +
     `• IMAGES: use LoremFlickr (https://loremflickr.com/W/H/keyword) — NEVER Picsum\n` +
     `• Return ONLY the complete updated HTML starting with <!DOCTYPE html>.`
@@ -1309,17 +1361,6 @@ export async function surgicalEditWebsite(
       const codeCollapsed = code.replace(/\s+/g, ' ');
       const colIdx = codeCollapsed.indexOf(wsCollapsed);
       if (colIdx !== -1) {
-        let origIdx = 0, colCount = 0;
-        while (colCount < colIdx && origIdx < code.length) {
-          if (code[origIdx] !== ' ' || codeCollapsed[colCount] === ' ') colCount++;
-          origIdx++;
-        }
-        let origEnd = origIdx;
-        let colSearchCount = 0;
-        while (colSearchCount < wsCollapsed.length && origEnd < code.length) {
-          if (code[origEnd] !== ' ' || colSearchCount < wsCollapsed.length) colSearchCount++;
-          origEnd++;
-        }
         const firstWord = wsCollapsed.slice(0, 40);
         const simpleIdx = code.indexOf(firstWord);
         if (simpleIdx !== -1) {
@@ -1373,7 +1414,8 @@ export async function surgicalEditWebsite(
           `Edit instructions: ${editPrompt}${contextNote}${inputSizeNote}\n\n` +
           `Respond with ONLY NDJSON patch lines. ` +
           `Each line: {"description":"...","search":"exact_verbatim_html_substring","replace":"replacement"}\n` +
-          `IMPORTANT: "replace" values must contain ZERO code comments. Use LoremFlickr (not Picsum) for any new images.`,
+          `IMPORTANT: "replace" values must contain ZERO code comments. Use LoremFlickr (not Picsum) for any new images.\n` +
+          `IMPORTANT: any new HTML in "replace" must land inside <body> — never after </body> or </html>.`,
       },
     ];
 
@@ -1447,14 +1489,16 @@ export async function surgicalEditWebsite(
             `━━━ EDIT RULES ━━━\n` +
             `• Apply ONLY the requested change — do NOT rewrite other sections\n` +
             `• Preserve all existing CSS variables, fonts, and design tokens\n` +
+            `• If adding JS: append to the existing DOMContentLoaded listener — never create a second one\n` +
             `• ZERO CODE COMMENTS — no HTML <!-- -->, JS //, or CSS /* */ anywhere\n` +
             `• IMAGES: use LoremFlickr (https://loremflickr.com/W/H/keyword) — NEVER Picsum\n` +
             `• Return the COMPLETE updated HTML starting with <!DOCTYPE html>.\n` +
+            `• </body></html> is the absolute last line — nothing after it.\n` +
             `• Keep it as close to the original as possible — minimal changes only.`,
         },
       ];
       let fbAccumulated = await streamOnce(effectiveKey, fallbackMessages, 0.5, onChunk, 30000);
-      let fbCode = stripFences(fbAccumulated);
+      let fbCode = trimAfterHtml(stripFences(fbAccumulated));
       if (!isHtmlComplete(fbCode)) {
         fbCode = fbCode + '\n</body></html>';
       }
