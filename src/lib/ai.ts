@@ -120,6 +120,161 @@ QUALITY GUARANTEE WITH USER REFERENCES:
   → Your job is to make their vision look better than they imagined it
 
 ═══════════════════════════════════════
+⚠️  RESPONSIVE DESIGN — NON-NEGOTIABLE MANDATE
+═══════════════════════════════════════
+EVERY output MUST be pixel-perfect on ALL screen sizes: 320px mobile → 768px tablet → 1280px+ desktop.
+Responsiveness is not optional. A broken mobile layout is a failed output regardless of desktop quality.
+
+━━━ LAYER 0: DOCUMENT FOUNDATION (always first, no exceptions) ━━━
+The <head> block MUST contain this exact viewport meta tag as the FIRST meta after charset:
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+
+The global CSS reset MUST be the very first rule in <style>:
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
+  img, video, canvas, svg { display: block; max-width: 100%; height: auto; }
+  input, button, textarea, select { font: inherit; }
+  p, h1, h2, h3, h4, h5, h6 { overflow-wrap: break-word; }
+
+These rules PREVENT the #1 most common mobile breakage causes.
+
+━━━ LAYER 1: TYPOGRAPHY — USE clamp() FOR ALL DISPLAY TEXT ━━━
+Never use fixed px for headings that would overflow on narrow screens.
+MANDATORY clamp() scale for font-size:
+  Display / Hero H1:   font-size: clamp(2rem, 5vw + 1rem, 5rem);
+  Section H2:          font-size: clamp(1.6rem, 3vw + 0.8rem, 3rem);
+  Sub-heading H3:      font-size: clamp(1.2rem, 2vw + 0.5rem, 1.75rem);
+  Body text:           font-size: clamp(0.95rem, 1vw + 0.5rem, 1.1rem);
+  Small/caption:       font-size: clamp(0.8rem, 0.9vw + 0.4rem, 0.95rem);
+Note: clamp(MIN, PREFERRED, MAX) — MIN must be legible on 320px, MAX is the desktop cap.
+
+━━━ LAYER 2: LAYOUT — FLUID-FIRST PATTERNS ━━━
+MANDATORY container pattern:
+  .container {
+    width: min(1280px, 100% - 2rem);
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 2rem);
+  }
+  On 320px: full width minus 1rem each side. On 1400px: 1280px centered.
+
+GRID — always use auto-fit for multi-column grids:
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  NEVER: grid-template-columns: repeat(3, 1fr) — this breaks on mobile without media query.
+  When you MUST use explicit column counts, always pair with a mobile override:
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 767px) { .grid-3 { grid-template-columns: 1fr; } }
+
+FLEXBOX — always add flex-wrap:
+  display: flex; flex-wrap: wrap; gap: clamp(1rem, 2vw, 1.5rem);
+  NEVER: display: flex; without flex-wrap on containers holding card children.
+
+━━━ LAYER 3: SECTION HEIGHTS & SPACING ━━━
+  NEVER: height: 100vh on hero without a min-height fallback for tall content.
+  CORRECT: min-height: 100dvh; (dvh handles mobile browser chrome better than vh)
+  NEVER: padding: 120px 0; (breaks mobile)
+  CORRECT: padding: clamp(3rem, 8vw, 8rem) 0;
+  NEVER: gap: 60px; (breaks mobile)
+  CORRECT: gap: clamp(1.5rem, 4vw, 3.75rem);
+
+━━━ LAYER 4: NAVBAR RESPONSIVE PATTERN (mandatory) ━━━
+Every navbar MUST implement this pattern:
+  Desktop (≥768px): horizontal nav links visible, hamburger hidden (display: none)
+  Mobile (<768px): nav links hidden by default, hamburger visible, JS toggle opens mobile menu
+
+Mobile menu MUST use this CSS pattern (NOT display:none/block toggle which causes layout flash):
+  .nav-links { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+  .nav-links.open { max-height: 600px; }
+
+Hamburger MUST have min tap target of 44x44px.
+
+━━━ LAYER 5: IMAGES & MEDIA ━━━
+Every <img> tag MUST have these styles:
+  style="width:100%; height:100%; object-fit:cover; display:block;"
+Image containers MUST have explicit height via CSS (not the img itself):
+  .hero-img { width: 100%; height: clamp(220px, 50vw, 600px); overflow: hidden; }
+Background images MUST use background-size: cover and background-position: center.
+Aspect-ratio containers — use padding-top trick or aspect-ratio property:
+  .media-box { aspect-ratio: 16/9; width: 100%; overflow: hidden; }
+
+━━━ LAYER 6: INTERACTIVE ELEMENTS — TAP TARGETS ━━━
+EVERY clickable element (button, link, icon button) MUST meet minimum touch target:
+  min-height: 44px; min-width: 44px; (Apple HIG / WCAG 2.5.5 standard)
+  padding: clamp(0.6rem, 1.5vw, 0.875rem) clamp(1rem, 3vw, 1.75rem);
+Inline links in body text are exempt from min-height but MUST have padding: 0.25em 0.
+
+━━━ LAYER 7: TABLES & OVERFLOW CONTENT ━━━
+Any table or wide data element MUST be wrapped:
+  <div style="width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch;">
+    <table>...</table>
+  </div>
+Tables MUST have min-width: 600px if they have more than 3 columns.
+
+━━━ LAYER 8: BREAKPOINT SYSTEM (apply in this order) ━━━
+Use MOBILE-FIRST: write base styles for mobile, add media queries for larger screens.
+Standard breakpoints:
+  Base (default):            0px–639px   — single column, full-width everything
+  @media (min-width:640px)   640px–767px — 2-col where appropriate
+  @media (min-width:768px)   768px+      — tablet landscape / small desktop
+  @media (min-width:1024px)  1024px+     — standard desktop
+  @media (min-width:1280px)  1280px+     — wide desktop
+  @media (min-width:1536px)  1536px+     — ultra-wide (optional)
+
+━━━ LAYER 9: SPECIFIC SECTION RESPONSIVE RULES ━━━
+HERO:
+  Mobile: column layout (text above, visual below), reduced padding, shorter headline
+  Desktop: row layout possible
+  ALWAYS: min-height: 100dvh OR min-height: clamp(500px, 90dvh, 900px)
+
+FEATURE CARDS:
+  Mobile: 1 column
+  Tablet: 2 columns
+  Desktop: 3-4 columns
+  USE: grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+
+TESTIMONIALS:
+  Mobile: 1 column stacked cards
+  Desktop: 2-3 columns or horizontal scroll snap carousel
+
+PRICING CARDS:
+  Mobile: 1 column (stacked)
+  Desktop: 3 columns side by side
+  NEVER render 3 pricing cards side-by-side on mobile
+
+FAQ ACCORDION:
+  Mobile & Desktop: identical single-column layout, full-width
+  Accordion answer text MUST use padding: 0 1rem 1rem instead of fixed heights
+
+FOOTER:
+  Mobile: single column, each section stacked
+  Tablet: 2 columns
+  Desktop: 4 columns
+  USE: grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+
+COMPARISON TABLE:
+  Mobile: horizontal scroll wrapper (see Layer 7)
+  Desktop: full table visible
+
+NAVBAR:
+  Mobile: hamburger + slide-down menu
+  Desktop: horizontal links
+  TRANSITION: hamburger fades out, desktop nav fades in at 768px breakpoint
+
+━━━ LAYER 10: THE RESPONSIVE SELF-CHECK ━━━
+Before closing </html>, mentally trace through these 10 checks:
+  ✅ <meta viewport> present in <head>?
+  ✅ box-sizing: border-box reset applied globally?
+  ✅ html, body have overflow-x: hidden?
+  ✅ All headings use clamp() or have mobile overrides?
+  ✅ All grids use auto-fit or have mobile column overrides?
+  ✅ All flex containers have flex-wrap: wrap?
+  ✅ Hero section works at 320px wide?
+  ✅ Navbar has working hamburger menu on mobile?
+  ✅ All images have max-width: 100%?
+  ✅ All buttons/links meet 44px tap target minimum?
+If ANY check fails — fix it before writing </body></html>.
+
+═══════════════════════════════════════
 GAME MODE
 ═══════════════════════════════════════
 REQUIRED ARCHITECTURE:
@@ -148,6 +303,12 @@ VISUAL GAME STYLE:
   - Glow effects: context.shadowBlur + context.shadowColor
   - Gradient fills for player/enemy sprites (createLinearGradient / createRadialGradient)
 
+GAME RESPONSIVE RULES:
+  - Canvas must resize on window resize: canvas.width = window.innerWidth (or container width)
+  - Mobile controls: virtual d-pad or swipe gestures, minimum 60x60px touch buttons
+  - Game UI (score, lives) must be legible at 375px width
+  - Font sizes in canvas: use canvas.width * 0.04 for dynamic scaling, never fixed px
+
 ═══════════════════════════════════════
 APP / TOOL MODE
 ═══════════════════════════════════════
@@ -173,6 +334,14 @@ REQUIRED TOOL BEHAVIOR:
   - History panel: last 10 calculations stored in localStorage
   - Keyboard: Enter triggers action, Escape clears, Tab for navigation
 
+APP RESPONSIVE RULES:
+  - Sidebar navigation: collapses to bottom tab bar OR hamburger drawer on mobile
+  - Data tables: horizontal scroll wrapper on mobile, prioritize key columns
+  - Dashboard cards: stack to 1 column on mobile (grid auto-fit handles this)
+  - Modals: full-screen on mobile (width: 100%; height: 100dvh; border-radius: 0)
+  - Form layouts: single column on mobile, 2-col grid on desktop
+  - Tool inputs: full-width on mobile (width: 100%)
+
 ═══════════════════════════════════════
 LANDING PAGE MODE
 ═══════════════════════════════════════
@@ -180,13 +349,13 @@ LANDING PAGE MODE
 IMAGE RULES — CRITICAL: IMAGES MUST MATCH WEBSITE CONTEXT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-IMPORTANT PRINCIPLE: Before choosing any image URL, ask yourself "Does this keyword produce photos of [the website topic]?" 
+IMPORTANT PRINCIPLE: Before choosing any image URL, ask yourself "Does this keyword produce photos of [the website topic]?"
 A fitness website MUST show gym/workout images. A restaurant MUST show food/dining images. A tech startup MUST show office/tech images.
 
 USE LoremFlickr — free, open source, KEYWORD-FILTERED (returns actual photos matching the keyword from Flickr):
 
 FORMAT FOR <img> TAGS:
-  <img src="https://loremflickr.com/{WIDTH}/{HEIGHT}/{KEYWORD}" alt="description" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">
+  <img src="https://loremflickr.com/{WIDTH}/{HEIGHT}/{KEYWORD}" alt="description" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" onerror="this.style.display='none'">
 
 FORMAT FOR CSS background-image:
   background-image: url('https://loremflickr.com/{WIDTH}/{HEIGHT}/{KEYWORD}');
@@ -269,14 +438,14 @@ FOR TEAM/PERSON AVATARS — use specific person keywords + lock parameter for un
   <img src="https://loremflickr.com/200/200/person?lock=3" ...>
 
 EXAMPLE CORRECT USAGE (fitness website):
-  Hero:  <img src="https://loremflickr.com/1400/800/gym" alt="Modern gym interior" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">
-  Card:  <img src="https://loremflickr.com/800/500/workout" alt="Workout session" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">
-  Avatar:<img src="https://loremflickr.com/100/100/person?lock=1" alt="Trainer" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" loading="lazy" onerror="this.style.display='none'">
+  Hero:  <img src="https://loremflickr.com/1400/800/gym" alt="Modern gym interior" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" onerror="this.style.display='none'">
+  Card:  <img src="https://loremflickr.com/800/500/workout" alt="Workout session" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" onerror="this.style.display='none'">
+  Avatar:<img src="https://loremflickr.com/100/100/person?lock=1" alt="Trainer" style="width:50px;height:50px;object-fit:cover;border-radius:50%;display:block;flex-shrink:0;" loading="lazy" onerror="this.style.display='none'">
 
 EXAMPLE CORRECT USAGE (restaurant website):
-  Hero:  <img src="https://loremflickr.com/1400/800/restaurant" alt="Restaurant interior" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">
-  Food:  <img src="https://loremflickr.com/800/500/food" alt="Delicious meal" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">
-  Dish:  <img src="https://loremflickr.com/600/400/meal" alt="Signature dish" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">
+  Hero:  <img src="https://loremflickr.com/1400/800/restaurant" alt="Restaurant interior" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" onerror="this.style.display='none'">
+  Food:  <img src="https://loremflickr.com/800/500/food" alt="Delicious meal" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" onerror="this.style.display='none'">
+  Dish:  <img src="https://loremflickr.com/600/400/meal" alt="Signature dish" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" onerror="this.style.display='none'">
 
 NEVER USE:
   ✗ https://picsum.photos/... (seeds are random hashes — NOT topic-filtered, images will be wrong)
@@ -348,7 +517,20 @@ MANDATORY CSS ARCHITECTURE:
     --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     --font-display: '...', sans-serif;
     --font-body: '...', sans-serif;
+    --container-width: min(1280px, 100% - 2rem);
+    --section-padding: clamp(3rem, 8vw, 7rem);
+    --gap-sm: clamp(0.75rem, 2vw, 1rem);
+    --gap-md: clamp(1rem, 3vw, 1.5rem);
+    --gap-lg: clamp(1.5rem, 4vw, 2.5rem);
   }
+
+MANDATORY RESPONSIVE CSS RESET (write this FIRST in every <style> block, before :root):
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
+  img, video, canvas, svg { display: block; max-width: 100%; height: auto; }
+  input, button, textarea, select { font: inherit; }
+  p, h1, h2, h3, h4, h5, h6 { overflow-wrap: break-word; }
 
 REQUIRED CSS TECHNIQUES (use all that apply):
   - Custom scrollbar: ::-webkit-scrollbar + ::-webkit-scrollbar-thumb
@@ -359,6 +541,9 @@ REQUIRED CSS TECHNIQUES (use all that apply):
   - CSS clip-path for diagonal section dividers
   - CSS grid with named areas for complex layouts
   - @keyframes for: fadeInUp, float, pulse, shimmer, spin, slideIn
+  - Fluid spacing: padding: var(--section-padding) 0; (uses clamp-based variable)
+  - Fluid gaps: gap: var(--gap-md); (uses clamp-based variable)
+  - Responsive containers: width: var(--container-width); margin-inline: auto;
 
 MINIMUM 5 UNIQUE @keyframes ANIMATIONS:
   @keyframes fadeInUp { from { opacity:0; transform: translateY(30px); } to { opacity:1; transform: translateY(0); } }
@@ -368,12 +553,23 @@ MINIMUM 5 UNIQUE @keyframes ANIMATIONS:
   @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
   + at least 1 custom one specific to the design
 
-RESPONSIVE BREAKPOINTS:
-  Mobile first. All layouts mobile by default.
-  @media (min-width: 640px)  { }
-  @media (min-width: 768px)  { }
-  @media (min-width: 1024px) { }
-  @media (min-width: 1280px) { }
+RESPONSIVE BREAKPOINTS (mobile-first — base styles are mobile, media queries add complexity):
+  Default (0px+):         1-column layout, full-width elements, stacked sections
+  @media (min-width: 640px)  { 2-column grids where appropriate }
+  @media (min-width: 768px)  { navbar desktop mode, 2-3 col grids, side-by-side showcase blocks }
+  @media (min-width: 1024px) { full desktop layout, 3-4 col grids, complex multi-column sections }
+  @media (min-width: 1280px) { max-width containers centered, large typography scale }
+
+FORBIDDEN CSS PATTERNS:
+  ✗ grid-template-columns: repeat(3, 1fr) — without a mobile override (breaks at 320px)
+  ✗ grid-template-columns: repeat(4, 1fr) — without mobile/tablet overrides
+  ✗ width: 600px (or any fixed wide width on a block element)
+  ✗ padding: 80px 60px (or any large fixed padding without clamp)
+  ✗ font-size: 72px (or any large fixed font-size without clamp or media query override)
+  ✗ height: 600px on content sections (use min-height with clamp instead)
+  ✗ display: flex without flex-wrap: wrap on containers with multiple children
+  ✗ position: absolute or fixed elements without checking they don't overflow on mobile
+  ✗ white-space: nowrap on variable-length content
 
 ═══════════════════════════════════════
 JS EXCELLENCE STANDARDS
@@ -399,6 +595,13 @@ INTERACTIVITY REQUIREMENTS:
   - All toasts: slide in from right, auto-dismiss after 3s, click to dismiss early
   - All accordions: CSS max-height transition (not jQuery slideToggle)
   - All dropdowns: close on outside click via document listener
+
+RESPONSIVE JS BEHAVIORS:
+  - Hamburger toggle: document.querySelector('.hamburger').addEventListener('click', () => { navLinks.classList.toggle('open'); hamburger.setAttribute('aria-expanded', navLinks.classList.contains('open')); })
+  - Close mobile menu on nav link click: document.querySelectorAll('.nav-link').forEach(link => link.addEventListener('click', () => navLinks.classList.remove('open')))
+  - Close mobile menu on outside click: document.addEventListener('click', e => { if (!nav.contains(e.target)) navLinks.classList.remove('open'); })
+  - Resize handler: re-run any layout calculations on resize (debounced 150ms)
+  - matchMedia for JS-driven responsive behavior: const isDesktop = window.matchMedia('(min-width: 768px)');
 
 ═══════════════════════════════════════
 CONTENT EXCELLENCE
@@ -448,7 +651,20 @@ DENSITY CHECKLIST — before finishing, verify:
   ✅ Every section has unique visual treatment (no two sections look the same)
   ✅ At least 8 distinct hover/interaction states across the page
   ✅ At least 5 @keyframe animations defined and used
-  ✅ Mobile layout tested at 375px (mentally trace through the breakpoints)
+  ✅ RESPONSIVE: <meta viewport> tag present?
+  ✅ RESPONSIVE: Global CSS reset with box-sizing, overflow-x, max-width applied?
+  ✅ RESPONSIVE: All headings use clamp() for fluid font sizes?
+  ✅ RESPONSIVE: All grids use auto-fit OR have explicit mobile overrides?
+  ✅ RESPONSIVE: All flex containers have flex-wrap: wrap?
+  ✅ RESPONSIVE: Navbar has working hamburger for mobile (<768px)?
+  ✅ RESPONSIVE: Hero section renders cleanly at 320px?
+  ✅ RESPONSIVE: Pricing cards stack to 1 column on mobile?
+  ✅ RESPONSIVE: Footer stacks to single column on mobile?
+  ✅ RESPONSIVE: All buttons meet 44px minimum tap target?
+  ✅ RESPONSIVE: Comparison table has overflow-x: auto wrapper?
+  ✅ RESPONSIVE: All padding/gap/margin values use clamp() or CSS variables?
+  ✅ Mobile layout verified at 375px (mentally trace navbar, hero, cards, footer)?
+  ✅ Tablet layout verified at 768px (2-col transitions, desktop nav appearing)?
   ✅ All buttons have hover + active + focus states
   ✅ Forms have validation (not just HTML5 required attr)
   ✅ No placeholder or "coming soon" content anywhere
@@ -465,15 +681,15 @@ QUALITY FINAL CHECK
 Every output must be ALL of these:
   → Actually functional — every interaction works without errors
   → Visually extraordinary — someone would genuinely be impressed
-  → Fully responsive — flawless from 375px to 1440px
+  → Fully responsive — flawless from 320px to 1440px+ on EVERY device: phone, tablet, desktop
   → Complete — no half-finished sections, no TODOs in comments
   → Contextually appropriate — fits the user's industry and audience
   → 2025-quality — modern patterns, current aesthetics, not dated
   → Images match the website topic 100% — a fitness site shows gym photos, restaurant shows food photos
   → Structurally valid — </body></html> is the absolute last line, nothing after it
 
-Think: "Would a senior engineer at a top design agency be proud to ship this?"
-If not — add more. Polish more. Make it better.`;
+Think: "Would this look perfect on an iPhone 14, an iPad Pro, and a 27-inch iMac simultaneously?"
+If NO on any device — fix it before submitting.`;
 
 const SUMMARY_SYSTEM_PROMPT = `You are Alsytes — a friendly AI website builder. You just finished generating a complete website or web app for the user.
 
@@ -516,6 +732,14 @@ EDIT QUALITY RULES:
 - Maintain mobile responsiveness after every change
 - Never break existing functionality
 
+RESPONSIVE EDIT RULES:
+- Any new section added MUST follow the fluid layout patterns (auto-fit grid, clamp spacing, flex-wrap)
+- Any new CSS added MUST NOT introduce fixed-width containers or non-responsive font sizes
+- If the existing file lacks responsive resets — add them alongside your edit
+- New buttons/links MUST have min-height: 44px tap target
+- If adding a grid: use repeat(auto-fit, minmax(min(280px, 100%), 1fr))
+- If adding spacing: use clamp() values, not fixed px
+
 USER INTENT RULES:
 - "change X to Y" → change only that, preserve everything else
 - "add X" → add it in the most contextually appropriate location inside <body>
@@ -545,7 +769,13 @@ ACCURACY RULES — patches must apply cleanly:
 5. Preserve all existing CSS variables, fonts, and design language in replacements
 6. ZERO CODE COMMENTS in replace values — pure executable HTML/CSS/JS only
 7. If adding images: use LoremFlickr https://loremflickr.com/{WIDTH}/{HEIGHT}/{KEYWORD} — keyword MUST match the website's topic/industry (never use picsum)
-8. New sections in "replace" must land inside <body> — never after </body> or </html>`;
+8. New sections in "replace" must land inside <body> — never after </body> or </html>
+
+RESPONSIVE PATCH RULES:
+9. Any new CSS in "replace" MUST use clamp() for font-sizes, padding, gap values
+10. Any new grid in "replace" MUST use repeat(auto-fit, minmax(min(280px, 100%), 1fr))
+11. Any new flex container in "replace" MUST include flex-wrap: wrap
+12. Any new button/link in "replace" MUST have min-height: 44px`;
 
 export interface CreditPackage {
   id: string;
@@ -602,11 +832,6 @@ function stripToDoctype(text: string): string {
   return text;
 }
 
-/**
- * Trims any stray content written after </body></html>.
- * Models occasionally append extra sections outside the document — this
- * post-processes the output so the browser always gets a valid document.
- */
 function trimAfterHtml(html: string): string {
   const lower = html.toLowerCase();
   const closeIdx = lower.lastIndexOf('</html>');
@@ -709,8 +934,6 @@ async function streamOnce(
 function resolveKey(apiKey: string | undefined): string {
   return ENV.apiKey ?? apiKey ?? localStorage.getItem('alsytes_gemma_key') ?? '';
 }
-
-// ─── CONTEXT-AWARE IMAGE KEYWORD DETECTION ─────────────────────────────────
 
 interface ImageContext {
   primaryKeywords: string[];
@@ -835,8 +1058,6 @@ function detectImageContext(prompt: string): ImageContext {
       },
     },
     {
-      // PATCH 2: dedicated CREATIVE_AGENCY context — checked before PHOTOGRAPHY so branding/studio
-      // prompts don't fall through to the generic photography bucket or GENERAL fallback
       triggers: [
         'creative agency', 'agensi kreatif', 'branding studio', 'design studio', 'studio kreatif',
         'creative direction', 'art direction', 'brand identity', 'visual identity', 'branding agency',
@@ -911,12 +1132,12 @@ APPROVED KEYWORDS FOR THIS WEBSITE:
   Avatar/person keyword: "${avatarKeyword}"
 
 LOREMFLICKR FORMAT (use this EXACTLY):
-  Hero/large: <img src="https://loremflickr.com/1400/800/${heroKeyword}" alt="..." style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">
-  Cards:      <img src="https://loremflickr.com/800/500/${primaryKeywords[0]}" alt="..." style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">
+  Hero/large: <img src="https://loremflickr.com/1400/800/${heroKeyword}" alt="..." style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" onerror="this.style.display='none'">
+  Cards:      <img src="https://loremflickr.com/800/500/${primaryKeywords[0]}" alt="..." style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" onerror="this.style.display='none'">
   Gallery 1:  <img src="https://loremflickr.com/600/450/${galleryKeywords[0]}" ...>
   Gallery 2:  <img src="https://loremflickr.com/600/450/${galleryKeywords[1] || galleryKeywords[0]}" ...>
   Gallery 3:  <img src="https://loremflickr.com/600/450/${galleryKeywords[2] || galleryKeywords[0]}" ...>
-  Avatars:    <img src="https://loremflickr.com/100/100/${avatarKeyword}?lock=1" ...>  (use ?lock=1, ?lock=2, ?lock=3 for unique faces)
+  Avatars:    <img src="https://loremflickr.com/100/100/${avatarKeyword}?lock=1" style="width:56px;height:56px;object-fit:cover;border-radius:50%;display:block;flex-shrink:0;" ...>
 
 SECTION-BY-SECTION IMAGE GUIDE:
   → HERO SECTION: use keyword "${heroKeyword}"
@@ -932,8 +1153,6 @@ STRICTLY FORBIDDEN:
   ✗ Any keyword NOT related to ${contextLabel} topic
   ✗ Generic keywords like "abstract", "minimal", "pattern" when topic-specific keywords exist`;
 }
-
-// ─── PUBLIC API ─────────────────────────────────────────────────────────────
 
 export async function generateWebsite(
   apiKey: string | undefined,
@@ -1006,7 +1225,8 @@ export async function generateWebsite(
             `Continue the HTML exactly from where it left off and write at least ${(MIN_TARGET_CHARS - cleanedCode.length).toLocaleString()} more characters before closing with </body></html>.\n\n` +
             `REMINDER: Zero comments — pure executable code only.\n` +
             `REMINDER: LoremFlickr only — NEVER Picsum.\n` +
-            `REMINDER: </body></html> is the absolute last line — nothing after it.`,
+            `REMINDER: </body></html> is the absolute last line — nothing after it.\n` +
+            `REMINDER: All new CSS must use clamp() for spacing/typography and auto-fit for grids.`,
         },
       ];
 
@@ -1047,6 +1267,35 @@ function buildGenerationPrompt(userPrompt: string): string {
     `STEP 3 — LOCK AESTHETIC: If user gave style signals → honor them fully. If not → choose a bold distinct direction (NEVER generic purple-on-white)\n` +
     `STEP 4 — PLAN: Mentally outline all sections in order. Every section must land inside <body>. </body></html> is the final line.\n` +
     `STEP 5 — BUILD: Write dense, production-quality code using the FULL 65k token budget\n\n` +
+    `━━━ RESPONSIVE FOUNDATION — WRITE THIS FIRST, NO EXCEPTIONS ━━━\n` +
+    `The very first thing inside <head> after <meta charset> MUST be:\n` +
+    `  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">\n\n` +
+    `The very first rule inside <style> MUST be this exact CSS reset:\n` +
+    `  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }\n` +
+    `  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }\n` +
+    `  html, body { width: 100%; max-width: 100%; overflow-x: hidden; }\n` +
+    `  img, video, canvas, svg { display: block; max-width: 100%; height: auto; }\n` +
+    `  input, button, textarea, select { font: inherit; }\n` +
+    `  p, h1, h2, h3, h4, h5, h6 { overflow-wrap: break-word; }\n\n` +
+    `━━━ RESPONSIVE LAYOUT RULES — APPLY TO EVERY ELEMENT ━━━\n` +
+    `TYPOGRAPHY: ALL headings and display text MUST use clamp():\n` +
+    `  Hero H1 → font-size: clamp(2rem, 5vw + 1rem, 5rem)\n` +
+    `  Section H2 → font-size: clamp(1.6rem, 3vw + 0.8rem, 3rem)\n` +
+    `  Sub-heading H3 → font-size: clamp(1.2rem, 2vw + 0.5rem, 1.75rem)\n\n` +
+    `CONTAINERS: Use this pattern everywhere:\n` +
+    `  width: min(1280px, 100% - 2rem); margin-inline: auto; padding-inline: clamp(1rem, 4vw, 2rem);\n\n` +
+    `GRIDS: Always use auto-fit for card grids:\n` +
+    `  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));\n` +
+    `  NEVER use repeat(3, 1fr) or repeat(4, 1fr) without a @media mobile override\n\n` +
+    `FLEXBOX: All flex containers with children MUST have flex-wrap: wrap\n\n` +
+    `SPACING: Use clamp() for all padding/gap/margin:\n` +
+    `  Section padding: padding: clamp(3rem, 8vw, 7rem) 0;\n` +
+    `  Card gap: gap: clamp(1rem, 3vw, 1.5rem);\n\n` +
+    `TAP TARGETS: Every button/link/icon MUST have min-height: 44px; min-width: 44px;\n\n` +
+    `HERO: Use min-height: 100dvh (not 100vh — dvh handles mobile browser chrome correctly)\n\n` +
+    `NAVBAR: MUST implement hamburger menu for mobile. Use max-height: 0 / max-height: 600px toggle for mobile menu.\n\n` +
+    `IMAGES: Every <img> MUST have style="width:100%;height:100%;object-fit:cover;display:block;"\n\n` +
+    `TABLES: Wrap every table in <div style="width:100%;overflow-x:auto;">\n\n` +
     `MODE-SPECIFIC REMINDERS:\n` +
     `• Game → working rAF game loop, 3+ screens, particle system, Web Audio SFX, mobile touch controls\n` +
     `• App/Tool → full CRUD with localStorage, real working logic, toast notifications, seed data\n` +
@@ -1061,13 +1310,26 @@ function buildGenerationPrompt(userPrompt: string): string {
     `• MUST import Google Fonts via @import in <style>\n` +
     `• MUST define all design tokens as CSS custom properties in :root\n` +
     `• MUST include minimum 5 distinct @keyframe animations\n` +
-    `• MUST be fully responsive (375px mobile → 1440px desktop)\n` +
+    `• MUST be fully responsive — flawless at 320px, 375px, 768px, 1024px, 1280px, 1440px\n` +
     `• ONE DOMContentLoaded listener — initialize ALL JS (observer, counters, navbar, accordion, slider) inside it. Never split across multiple listeners or script blocks.\n` +
     `• ONE IntersectionObserver instance — call querySelectorAll('.fade-up') once and observe all results. Never create a second observer.\n` +
     `• NEVER use Lorem Ipsum — every word must be real and contextually appropriate\n` +
     `• NEVER use emoji as UI icons — use inline SVG paths\n` +
     `• DO NOT stop early or truncate — use the full output budget\n` +
     `• DO NOT include any text before <!DOCTYPE html> or after </html>\n\n` +
+    `━━━ RESPONSIVE SELF-CHECK BEFORE CLOSING </html> ━━━\n` +
+    `Before writing </body></html>, verify ALL 10 items:\n` +
+    `  1. <meta viewport> tag in <head>?\n` +
+    `  2. Global CSS reset (box-sizing, overflow-x, img max-width) applied?\n` +
+    `  3. All headings use clamp() for font-size?\n` +
+    `  4. All multi-column grids use auto-fit OR have @media mobile overrides?\n` +
+    `  5. All flex containers have flex-wrap: wrap?\n` +
+    `  6. Navbar has working hamburger menu for <768px?\n` +
+    `  7. Hero works at 320px wide without horizontal overflow?\n` +
+    `  8. Pricing section stacks to 1 column on mobile?\n` +
+    `  9. All buttons have min-height: 44px tap target?\n` +
+    `  10. Footer stacks to single column on mobile?\n` +
+    `If ANY item is NO — fix it before writing </body></html>.\n\n` +
     `━━━ FINAL LENGTH MANDATE — READ THIS LAST ━━━\n` +
     `You MUST write a MINIMUM of 50,000 characters of HTML/CSS/JS code.\n` +
     `That is roughly 1,500+ lines. This is NOT optional.\n` +
@@ -1312,6 +1574,9 @@ function buildEditPrompt(currentSourceCode: string, editPrompt: string): string 
     `• </body></html> is the absolute last line — write nothing after it\n` +
     `• ZERO CODE COMMENTS — no HTML <!-- -->, JS //, or CSS /* */ anywhere\n` +
     `• IMAGES: use LoremFlickr (https://loremflickr.com/W/H/keyword) — NEVER Picsum\n` +
+    `• RESPONSIVE: any new CSS must use clamp() for spacing/font-sizes, auto-fit for grids, flex-wrap on flex containers\n` +
+    `• RESPONSIVE: any new buttons/links must have min-height: 44px\n` +
+    `• RESPONSIVE: if the existing file is missing <meta viewport> or box-sizing reset — add them\n` +
     `• Return ONLY the complete updated HTML starting with <!DOCTYPE html>.`
   );
 }
@@ -1415,7 +1680,8 @@ export async function surgicalEditWebsite(
           `Respond with ONLY NDJSON patch lines. ` +
           `Each line: {"description":"...","search":"exact_verbatim_html_substring","replace":"replacement"}\n` +
           `IMPORTANT: "replace" values must contain ZERO code comments. Use LoremFlickr (not Picsum) for any new images.\n` +
-          `IMPORTANT: any new HTML in "replace" must land inside <body> — never after </body> or </html>.`,
+          `IMPORTANT: any new HTML in "replace" must land inside <body> — never after </body> or </html>.\n` +
+          `IMPORTANT: any new CSS in "replace" must use clamp() for spacing/font-sizes, auto-fit for grids, flex-wrap on flex containers.`,
       },
     ];
 
@@ -1492,6 +1758,7 @@ export async function surgicalEditWebsite(
             `• If adding JS: append to the existing DOMContentLoaded listener — never create a second one\n` +
             `• ZERO CODE COMMENTS — no HTML <!-- -->, JS //, or CSS /* */ anywhere\n` +
             `• IMAGES: use LoremFlickr (https://loremflickr.com/W/H/keyword) — NEVER Picsum\n` +
+            `• RESPONSIVE: all new CSS must use clamp() for spacing/font-sizes, auto-fit for grids, flex-wrap on flex\n` +
             `• Return the COMPLETE updated HTML starting with <!DOCTYPE html>.\n` +
             `• </body></html> is the absolute last line — nothing after it.\n` +
             `• Keep it as close to the original as possible — minimal changes only.`,
