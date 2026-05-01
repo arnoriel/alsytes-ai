@@ -178,14 +178,11 @@ export default function PreviewPage() {
   const iframeWrittenRef = useRef(false);
 
   const writeIframe = useCallback((code: string) => {
-    const doc = iframeRef.current?.contentDocument;
-    if (doc) {
-      iframeWrittenRef.current = true;
-      doc.open();
-      doc.write(code);
-      doc.close();
-      setIsLoading(false);
-    }
+    if (!iframeRef.current) return;
+    // Use srcdoc instead of doc.write — safer, no allow-same-origin needed
+    iframeWrittenRef.current = true;
+    iframeRef.current.srcdoc = code;
+    // setIsLoading is handled by onLoad handler
   }, []);
 
   useEffect(() => {
@@ -698,7 +695,7 @@ export default function PreviewPage() {
                   className="w-full border-0"
                   style={{ height: viewportMode !== 'desktop' ? '812px' : '100vh', display: 'block' }}
                   title={`Preview: ${website.name}`}
-                  sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                  sandbox="allow-scripts allow-forms allow-popups"
                 />
               </div>
             </div>
@@ -784,7 +781,7 @@ export default function PreviewPage() {
                   className="w-full border-0"
                   style={{ height: '100%', minHeight: '60vh', display: 'block' }}
                   title={`Preview: ${website.name}`}
-                  sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                  sandbox="allow-scripts allow-forms allow-popups"
                 />
               </div>
             </div>

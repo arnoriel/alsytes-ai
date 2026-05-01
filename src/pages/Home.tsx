@@ -169,6 +169,14 @@ export default function Home() {
       return;
     }
 
+    // Reserve credit BEFORE generation starts — prevents free-ride if user
+    // closes tab or network drops after receiving code but before deduction.
+    const creditReserved = await consumeCredit();
+    if (!creditReserved) {
+      setCreditModalOpen(true);
+      return;
+    }
+
     setMode('prompt');
     setStatus('thinking');
     setStreamedCode('');
@@ -205,9 +213,7 @@ export default function Home() {
         setStatus('done');
         await refreshWebsites();
 
-        // ── Deduct 1 credit on successful website creation ────────
-        await consumeCredit();
-
+        // Credit was already reserved before generation started
         setSummaryStatus('generating');
         let summaryAcc = '';
         await generateWebsiteSummary(apiKey, prompt, fullCode, {

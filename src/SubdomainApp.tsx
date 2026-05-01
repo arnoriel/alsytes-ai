@@ -80,7 +80,7 @@ export default function SubdomainApp({ pageName }: SubdomainAppProps) {
         onLoad={() => setIsLoading(false)}
         className="w-full h-full border-0 block"
         title={website.name}
-        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+        sandbox="allow-scripts allow-forms allow-popups allow-modals"
       />
     </div>
   );

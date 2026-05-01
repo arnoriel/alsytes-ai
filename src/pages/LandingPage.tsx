@@ -302,28 +302,16 @@ export default function LandingPage() {
           />
           {/* Animated orbs */}
           <motion.div
-            animate={{ x: [0, 60, -40, 0], y: [0, -80, 40, 0], scale: [1, 1.15, 0.95, 1] }}
-            transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+            animate={{ x: [0, 50, -30, 0], y: [0, -60, 30, 0] }}
+            transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
             className="absolute"
-            style={{ width: 700, height: 700, borderRadius: '50%', background: 'radial-gradient(circle, rgba(124,58,237,0.25) 0%, transparent 70%)', top: '-20%', left: '-15%', filter: 'blur(70px)' }}
+            style={{ width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(124,58,237,0.22) 0%, transparent 70%)', top: '-15%', left: '-10%', filter: 'blur(80px)', willChange: 'transform' }}
           />
           <motion.div
-            animate={{ x: [0, -70, 50, 0], y: [0, 60, -50, 0], scale: [1, 0.9, 1.2, 1] }}
-            transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
+            animate={{ x: [0, -50, 40, 0], y: [0, 50, -40, 0] }}
+            transition={{ duration: 24, repeat: Infinity, ease: 'easeInOut', delay: 4 }}
             className="absolute"
-            style={{ width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(249,115,22,0.22) 0%, transparent 70%)', top: '15%', right: '-15%', filter: 'blur(70px)' }}
-          />
-          <motion.div
-            animate={{ x: [0, 50, -60, 0], y: [0, -50, 70, 0], scale: [1, 1.2, 0.85, 1] }}
-            transition={{ duration: 26, repeat: Infinity, ease: 'easeInOut', delay: 6 }}
-            className="absolute"
-            style={{ width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(239,68,68,0.18) 0%, transparent 70%)', bottom: '5%', left: '25%', filter: 'blur(70px)' }}
-          />
-          <motion.div
-            animate={{ x: [0, -40, 30, 0], y: [0, 40, -60, 0], scale: [1, 1.1, 0.9, 1] }}
-            transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut', delay: 9 }}
-            className="absolute"
-            style={{ width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(147,51,234,0.20) 0%, transparent 70%)', bottom: '30%', right: '10%', filter: 'blur(60px)' }}
+            style={{ width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(249,115,22,0.18) 0%, transparent 70%)', top: '10%', right: '-10%', filter: 'blur(80px)', willChange: 'transform' }}
           />
           {/* Dot grid */}
           <div
@@ -712,6 +700,7 @@ export default function LandingPage() {
                 src="https://www.youtube.com/embed/63-9LM_yDyc?rel=0&modestbranding=1&color=white"
                 title="How to Use Alsytes"
                 frameBorder="0"
+                loading="lazy"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
               />

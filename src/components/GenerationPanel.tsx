@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   CheckCircle2, AlertCircle, Eye, Sparkles, Bot,
@@ -20,10 +20,23 @@ interface GenerationPanelProps {
   userName?: string;
 }
 
-function renderMarkdown(text: string): string {
-  return text
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\n/g, '<br/>');
+// Safe text rendering - bold only, no HTML injection
+function renderSafeMarkdown(text: string): React.ReactNode[] {
+  return text.split('\n').flatMap((line, li) => {
+    const parts: React.ReactNode[] = [];
+    let last = 0;
+    const boldRe = /\*\*(.*?)\*\*/g;
+    let match;
+    let key = 0;
+    while ((match = boldRe.exec(line)) !== null) {
+      if (match.index > last) parts.push(<span key={key++}>{line.slice(last, match.index)}</span>);
+      parts.push(<strong key={key++}>{match[1]}</strong>);
+      last = match.index + match[0].length;
+    }
+    if (last < line.length) parts.push(<span key={key++}>{line.slice(last)}</span>);
+    if (li < text.split('\n').length - 1) parts.push(<br key={`br-${li}`} />);
+    return parts;
+  });
 }
 
 // Real streaming-based progress phases derived from actual char count
@@ -491,8 +504,9 @@ export default function GenerationPanel({
                 ref={summaryRef}
                 className="text-sm leading-relaxed overflow-y-auto"
                 style={{ maxHeight: 300, color: '#4A4660' }}
-                dangerouslySetInnerHTML={{ __html: renderMarkdown(summaryMessage) }}
-              />
+              >
+                {renderSafeMarkdown(summaryMessage)}
+              </div>
             </div>
           </motion.div>
         )}
